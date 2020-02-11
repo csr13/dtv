@@ -1,5 +1,5 @@
 # csr
-# 1-800-745-6034
+
 
 import os
 import pdb
@@ -9,13 +9,62 @@ import pygame
 from pygame.locals import *
 
 
+dirty_rect = []
+
+
+class BaseObject(object):
+
+    def init(self, imagen):
+        self.imagen = imagen
+        self.rect = self.image.get_rect()
+
+    def update(self):
+        pass
+
+    def draw(self, screen):
+        t = screen.blit(self.imagen, self.rect)
+        dirty_rect.append(t)
+
+
+    def erase(self, screen, background):
+        t = screen.blit(background, self.rect, self.rect)
+        dirty_rect.append(t)
+
+
+class Unicornio(BaseObject):
+    
+    def __init__(self):
+        super().__init__(self)
+        pass 
+
+
+class Bigot(BaseObject):
+    
+    def __init__(self):
+        super().__init__(self)
+        pass 
+
+
+class Explosion(BaseObject):
+    
+    def __init__(self):
+        super().__init__(self)
+        pass 
+
+
+
+class Laser(BaseObject):
+    
+    def __init__(self):
+        super().__init__(self)
+        pass
+
+
 # -------------------------------------------------------------------------
 # Llamada principal
 # -------------------------------------------------------------------------
 
-
 pygame.init()
-
 
 # -------------------------------------------------------------------------
 # Configuraciones 
@@ -26,27 +75,22 @@ SCREENRECT = Rect(0, 0, 640, 480)
 PUNTAJE    = 0
 VIDAS      = 3
 
-
 # Inits
 clock = pygame.time.Clock()
 pygame.key.set_repeat(10,100)
 
-
 # -------------------------------------------------------------------------
 # Pantalla
 # -------------------------------------------------------------------------
-
 
 screen = pygame.display.set_mode((480, 480))
 pygame.display.set_caption("<[*_*]> Space Unicorn -- CSR")
 background = pygame.Surface(screen.get_size()).convert()
 background.fill((0,0,0))
 
-
 # -------------------------------------------------------------------------
 # Texto
 # -------------------------------------------------------------------------
-
 
 score = pygame.font.SysFont("ubuntumono", 20)
 score = score.render(f"Puntos : {PUNTAJE}", 2, (102, 255, 102))
@@ -55,7 +99,6 @@ score_position = score.get_rect(top=30, right=110)
 vidas = pygame.font.SysFont("ubuntumono", 20)
 vidas = vidas.render(f"Vidas: ", 2, (102, 255, 102))
 vidas_position = vidas.get_rect(top=30, right=200)
-
 
 # -------------------------------------------------------------------------
 # Fondo de imagen.
@@ -92,34 +135,31 @@ for each in range(VIDAS):
     padding[1] += 35
 
 
-
 # -------------------------------------------------------------------------
 # Loop
 # -------------------------------------------------------------------------
 
-
 while bool(1):
-
 
     # -------------------------------------------------------------------------
     # Acciones
     # -------------------------------------------------------------------------
 
-
     shield, rotate = (False, False,)
-
 
     # -------------------------------------------------------------------------
     # Eventos
     # -------------------------------------------------------------------------
-
 
     for event in pygame.event.get():
 
         if event.type == pygame.QUIT:
             exit(1)
 
+
+        pygame.event.pump()
         key = pygame.key.get_pressed()
+
 
         if key[K_DOWN]:
             unicorn_rect = unicorn_rect.move(0, 15)
@@ -149,12 +189,11 @@ while bool(1):
     # Blits
     # -------------------------------------------------------------------------
 
-
     screen.blit(background, (0,0))
     background.blit(score, score_position)
     background.blit(vidas, vidas_position)
     if rotate:
-        unicorn = pygame.transform.rotate(unicorn, 45)
+        unicorn = pygame.transform.rotate(unicorn, 90)
     if shield:
         shield = pygame.Surface(unicorn.get_size(), )
         shield.fill((102, 255, 102))
@@ -162,11 +201,9 @@ while bool(1):
 
     screen.blit(unicorn, unicorn_rect)
 
-
     # -------------------------------------------------------------------------
     # Updatear la pantall
     # -------------------------------------------------------------------------
-
 
     pygame.display.update()
     clock.tick(30)
