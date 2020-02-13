@@ -34,8 +34,9 @@ class BaseObject(object):
 class Unicornio(BaseObject):
     
     def __init__(self):
-        super().__init__(self)
-        pass 
+        self.alive = True
+        self.reloading = True
+
 
 
 class Bigot(BaseObject):
@@ -124,6 +125,7 @@ courage_symbol = os.path.join(os.getcwd(), "imagenes", "heart.png")
 courage_meter  = []
 padding        = [23, 195] # se incrementa el rango aqui
 padding_copy   = padding[:] # copia para reiniciar vidas
+
 
 # Carga las vidas de el jugador a la pantalla.
 for each in range(VIDAS):
