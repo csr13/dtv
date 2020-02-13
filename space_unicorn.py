@@ -9,57 +9,35 @@ import pygame
 from pygame.locals import *
 
 
-dirty_rect = []
+class Img:
+    pass
 
 
-class BaseObject(object):
-
-    def init(self, imagen):
-        self.imagen = imagen
-        self.rect = self.image.get_rect()
-
-    def update(self):
-        pass
-
-    def draw(self, screen):
-        t = screen.blit(self.imagen, self.rect)
-        dirty_rect.append(t)
-
-
-    def erase(self, screen, background):
-        t = screen.blit(background, self.rect, self.rect)
-        dirty_rect.append(t)
+def load_image(file, transparent=None):
+    """
+    Loads an image, prepares it for play.
+    """
+    file = os.path.join(os.getcwd(), "imagenes", file)
+    try:
+        surface = pygame.image.load(file)
+    except pygame.error:
+        raise SystemExit('Could not load image "%s" %s' %
+                         (file, pygame.get_error()))
+    if transparent:
+        corner = surface.get_at((0, 0))
+        surface.set_colorkey(corner, RLEACCEL)
+    return surface
 
 
-class Unicornio(BaseObject):
-    
-    def __init__(self):
-        self.alive = True
-        self.reloading = True
-
-
-
-class Bigot(BaseObject):
-    
-    def __init__(self):
-        super().__init__(self)
-        pass 
-
-
-class Explosion(BaseObject):
-    
-    def __init__(self):
-        super().__init__(self)
-        pass 
-
-
-
-class Laser(BaseObject):
-    
-    def __init__(self):
-        super().__init__(self)
-        pass
-
+def writer(phrase=None, font=None, size=None, color=None, where=None):
+    """
+    Writes a phrase given all the parameters.
+    """
+    if phrase and font and size and color and where:
+        to_write = pygame.font.SysFont(font, size)
+        to_write = to_write.render(phrase, 2, color)
+        position = to_write.get_rect(**where)
+        return to_write, position
 
 # -------------------------------------------------------------------------
 # Llamada principal
@@ -86,30 +64,32 @@ pygame.key.set_repeat(10,100)
 
 screen = pygame.display.set_mode((480, 480))
 pygame.display.set_caption("<[*_*]> Space Unicorn -- CSR")
-background = pygame.Surface(screen.get_size()).convert()
-background.fill((0,0,0))
+
 
 # -------------------------------------------------------------------------
 # Texto
 # -------------------------------------------------------------------------
 
-score = pygame.font.SysFont("ubuntumono", 20)
-score = score.render(f"Puntos : {PUNTAJE}", 2, (102, 255, 102))
-score_position = score.get_rect(top=30, right=110)
+score, score_position = writer(
+    phrase=f"Puntos: {PUNTAJE}",
+    font="ubuntumono",
+    size=20,
+    color=(102, 255, 102),
+    where={"top" : 30, "right" : 110}
+)
 
 vidas = pygame.font.SysFont("ubuntumono", 20)
 vidas = vidas.render(f"Vidas: ", 2, (102, 255, 102))
 vidas_position = vidas.get_rect(top=30, right=200)
 
 # -------------------------------------------------------------------------
-# Fondo de imagen.
+# Imagenes
 # -------------------------------------------------------------------------
 
-background_path = os.path.join(os.getcwd(), "imagenes", "background.gif")
-background_tile = pygame.image.load(background_path).convert()
+
 background = pygame.Surface(SCREENRECT.size)
-for x in range(0, SCREENRECT.width, background_tile.get_width()):
-    background.blit(background_tile, (x, 0))
+for x in range(0, SCREENRECT.width, Img.background.get_width()):
+    background.blit(Img.background, (x, 0))
 background_rect = background.get_rect()
 
 # -------------------------------------------------------------------------
@@ -117,9 +97,8 @@ background_rect = background.get_rect()
 # -------------------------------------------------------------------------
 
 posicion_init  = (480//2, 480//2)
-unicorn_path   = os.path.join(os.getcwd(), "imagenes", "unicorn.png")
-unicorn        = pygame.image.load(unicorn_path)
-unicorn_rect   = unicorn.get_rect(center=posicion_init)
+Img.unicorn    = load_image("unicorn.png")
+unicorn_rect   = Img.unicorn.get_rect(center=posicion_init)
 
 courage_symbol = os.path.join(os.getcwd(), "imagenes", "heart.png")
 courage_meter  = []
@@ -195,13 +174,13 @@ while bool(1):
     background.blit(score, score_position)
     background.blit(vidas, vidas_position)
     if rotate:
-        unicorn = pygame.transform.rotate(unicorn, 90)
+        unicorn = pygame.transform.rotate(Img.unicorn, 90)
     if shield:
-        shield = pygame.Surface(unicorn.get_size(), )
+        shield = pygame.Surface(Img.unicorn.get_size(), )
         shield.fill((102, 255, 102))
         screen.blit(shield, (unicorn_rect.x, unicorn_rect.y))
 
-    screen.blit(unicorn, unicorn_rect)
+    screen.blit(Img.unicorn, unicorn_rect)
 
     # -------------------------------------------------------------------------
     # Updatear la pantall
