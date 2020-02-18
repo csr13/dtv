@@ -2,7 +2,9 @@
 
 ### Requirements
 `python3.6`
-To install the necessary requirements in order to test this game, just do a simple
+
+
+Two required libraries included in `requirements.txt`
 
 ```python3
 python3.6 -m pip install -r requirements.txt
