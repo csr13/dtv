@@ -1,6 +1,5 @@
 # csr
 
-
 import os
 import pdb
 
@@ -8,16 +7,27 @@ from PIL import Image
 import pygame
 from pygame.locals import *
 
+from config import images_path
+from utils import Img
 
-class Img:
-    pass
+
+# Constantes ==================================================================
+
+
+SCREENRECT = Rect(0, 0, 640, 480)
+PUNTAJE    = 0
+VIDAS      = 3
+
+
+# Funciones de ayuda ==========================================================
 
 
 def load_image(file, transparent=None):
     """
-    Loads an image, prepares it for play.
+    Cargador de imagenes.
     """
-    file = os.path.join(os.getcwd(), "imagenes", file)
+
+    file = os.path.join(images_path, file)
     try:
         surface = pygame.image.load(file)
     except pygame.error:
@@ -31,44 +41,37 @@ def load_image(file, transparent=None):
 
 def writer(phrase=None, font=None, size=None, color=None, where=None):
     """
-    Writes a phrase given all the parameters.
+    Esta funcion necesita algo de trabajo, pero funciona, y su uso es
+    sencillo, crea un SysFont objeto y regresa un tuple para blitearlo
+    a la pantalla.
     """
+
     if phrase and font and size and color and where:
         to_write = pygame.font.SysFont(font, size)
         to_write = to_write.render(phrase, 2, color)
         position = to_write.get_rect(**where)
         return to_write, position
 
-# -------------------------------------------------------------------------
-# Llamada principal
-# -------------------------------------------------------------------------
 
 pygame.init()
 
-# -------------------------------------------------------------------------
-# Configuraciones 
-# -------------------------------------------------------------------------
 
-# Constantes
-SCREENRECT = Rect(0, 0, 640, 480)
-PUNTAJE    = 0
-VIDAS      = 3
+# Inits =======================================================================
 
-# Inits
+
 clock = pygame.time.Clock()
 pygame.key.set_repeat(10,100)
 
-# -------------------------------------------------------------------------
-# Pantalla
-# -------------------------------------------------------------------------
+
+# Pantalla ====================================================================
+
 
 screen = pygame.display.set_mode((480, 480))
-pygame.display.set_caption("<[*_*]> Space Unicorn -- CSR")
+pygame.display.set_caption("<[*_*]> Space Unicorn")
 
 
-# -------------------------------------------------------------------------
-# Texto
-# -------------------------------------------------------------------------
+# Texto =======================================================================
+
 
 score, score_position = writer(
     phrase=f"Puntos: {PUNTAJE}",
@@ -77,38 +80,35 @@ score, score_position = writer(
     color=(102, 255, 102),
     where={"top" : 30, "right" : 110}
 )
+vidas, vidas_position = writer(
+    phrase=f"Vidas: ",
+    font="ubuntumono",
+    size=20,
+    color=(102,255,102),
+    where={"top" : 30, "right" : 200}
+)
 
-vidas = pygame.font.SysFont("ubuntumono", 20)
-vidas = vidas.render(f"Vidas: ", 2, (102, 255, 102))
-vidas_position = vidas.get_rect(top=30, right=200)
 
-# -------------------------------------------------------------------------
-# Imagenes
-# -------------------------------------------------------------------------
+# Background ==================================================================
 
+Img.background = load_image("background.gif")
 
 background = pygame.Surface(SCREENRECT.size)
 for x in range(0, SCREENRECT.width, Img.background.get_width()):
     background.blit(Img.background, (x, 0))
 background_rect = background.get_rect()
 
-# -------------------------------------------------------------------------
-# Imagenes
-# -------------------------------------------------------------------------
 
-posicion_init  = (480//2, 480//2)
-Img.unicorn    = load_image("unicorn.png")
-unicorn_rect   = Img.unicorn.get_rect(center=posicion_init)
+# Carga las vidas de el jugador a la pantalla. ================================
 
-courage_symbol = os.path.join(os.getcwd(), "imagenes", "heart.png")
+
+Img.heart      = load_image("heart.png")
 courage_meter  = []
-padding        = [23, 195] # se incrementa el rango aqui
-padding_copy   = padding[:] # copia para reiniciar vidas
+padding        = [23, 195]
+padding_copy   = padding[:] 
 
-
-# Carga las vidas de el jugador a la pantalla.
 for each in range(VIDAS):
-    courage_load = pygame.image.load(courage_symbol)
+    courage_load = Img.heart
     courage_meter.append(courage_load.get_rect())
     courage_meter[each].x = padding[1]
     courage_meter[each].y = padding[0]
@@ -116,31 +116,44 @@ for each in range(VIDAS):
     padding[1] += 35
 
 
-# -------------------------------------------------------------------------
-# Loop
-# -------------------------------------------------------------------------
+# Imagenes ====================================================================
+
+
+posicion_init  = (480//2, 480//2)
+Img.unicorn    = load_image("unicorn.png")
+unicorn_rect   = Img.unicorn.get_rect(center=posicion_init)
+
+
+# Loop ========================================================================
 
 while bool(1):
 
-    # -------------------------------------------------------------------------
-    # Acciones
-    # -------------------------------------------------------------------------
+    # Acciones ================================================================
 
     shield, rotate = (False, False,)
 
-    # -------------------------------------------------------------------------
-    # Eventos
-    # -------------------------------------------------------------------------
+    # Eventos =================================================================
 
     for event in pygame.event.get():
 
         if event.type == pygame.QUIT:
             exit(1)
 
-
         pygame.event.pump()
         key = pygame.key.get_pressed()
 
+        # Para que no se salga de la pantalla el unicornio ====================
+
+        # Reglas para que no se valla para abrriba o para la izquierda 
+        if unicorn_rect.x < 0: unicorn_rect.x = 0
+        if unicorn_rect.y < 0 : unicorn_rect.y = 0
+
+        # Reglas para que no se valla para abajo o para la derecha 
+        if unicorn_rect.x > (480-40): unicorn_rect.x = 473-40
+        if unicorn_rect.y > (480-40): unicorn_rect.y = (473-40)
+        
+        
+        # Teclados ============================================================
 
         if key[K_DOWN]:
             unicorn_rect = unicorn_rect.move(0, 15)
@@ -151,10 +164,18 @@ while bool(1):
             print("[*] arriba")
 
         if key[K_RIGHT]:
+            Img.unicorn  = load_image("unicorn.png")
+            copy_pos     = (unicorn_rect.x, unicorn_rect.y)
+            unicorn_rect = Img.unicorn.get_rect()
+            unicorn_rect.x, unicorn_rect.y = copy_pos
             unicorn_rect = unicorn_rect.move(15, 0)
             print("[*] derecha")
 
         if key[K_LEFT]:
+            Img.unicorn  = load_image("left_unicorn.png")
+            copy_pos     = (unicorn_rect.x, unicorn_rect.y)
+            unicorn_rect = Img.unicorn.get_rect()
+            unicorn_rect.x, unicorn_rect.y = copy_pos
             unicorn_rect = unicorn_rect.move(-15, 0)
             print("[*] izquierda")
 
@@ -166,25 +187,28 @@ while bool(1):
             rotate = True
             print("[*] rotate")
         
-    # -------------------------------------------------------------------------
-    # Blits
-    # -------------------------------------------------------------------------
+
+   
+    # Blits ===================================================================
+    
 
     screen.blit(background, (0,0))
     background.blit(score, score_position)
     background.blit(vidas, vidas_position)
+
+
     if rotate:
-        unicorn = pygame.transform.rotate(Img.unicorn, 90)
+        Img.unicorn = pygame.transform.rotate(Img.unicorn, 90)
+    
     if shield:
-        shield = pygame.Surface(Img.unicorn.get_size(), )
+        shield = pygame.Surface(Img.unicorn.get_size())
         shield.fill((102, 255, 102))
         screen.blit(shield, (unicorn_rect.x, unicorn_rect.y))
 
+    # blitea el unicornio ya que este activado
     screen.blit(Img.unicorn, unicorn_rect)
 
-    # -------------------------------------------------------------------------
-    # Updatear la pantall
-    # -------------------------------------------------------------------------
+    # Updatear la pantalla ====================================================
 
     pygame.display.update()
     clock.tick(30)
