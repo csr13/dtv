@@ -1,5 +1,3 @@
-# csr
-
 import os
 import pdb
 
