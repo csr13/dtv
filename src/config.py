@@ -9,8 +9,8 @@ from pygame import Rect
 
 SCREENRECT = Rect(0, 0, 640, 480)
 PUNTAJE    = 0
-VIDAS      = 3
-
+VIDAS      = 5
+CHECK      = {"limite" : (480-40), "reset" : (473-40)}
 
 # Utilidades ===================================================================
 
