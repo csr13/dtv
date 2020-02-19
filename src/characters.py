@@ -9,7 +9,6 @@ from utils import load_image
 from basemodel import BaseModel
 
 
-
 class Unicorn(BaseModel):
     """
     El Unicorn.
@@ -75,8 +74,8 @@ class Unicorn(BaseModel):
         self.boundary_check()
 
 
-
     def update(self, screen):
+
         if self.rotate:
             self.image = pygame.transform.rotate(self.image, 90)
     

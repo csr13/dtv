@@ -7,7 +7,9 @@ from config import images_path
 
 
 class Img:
-    """Contenedor de imagenes."""
+    """
+    Contenedor de imagenes.
+    """
     pass
 
 

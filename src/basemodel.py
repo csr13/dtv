@@ -1,7 +1,6 @@
 from utils import load_image
 
 
-
 class BaseModel(object):
 
     def __init__(self, img, spawn_location=None):
