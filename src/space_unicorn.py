@@ -4,6 +4,7 @@ import pdb
 import pygame
 from pygame.locals import *
 
+from characters import Unicornio
 from config import (PUNTAJE, SCREENRECT, VIDAS)
 from utils import load_image, Img, writer
 
@@ -13,7 +14,7 @@ from utils import load_image, Img, writer
 pygame.init()
 clock = pygame.time.Clock()
 pygame.key.set_repeat(10,100)
-
+check = {"limite" : (480-40), "reset" : (473-40)}
 
 # Pantalla ====================================================================
 
@@ -61,7 +62,7 @@ padding        = [23, 195]
 padding_copy   = padding[:] 
 
 for each in range(VIDAS):
-    
+
     courage_load = Img.heart
     courage_meter.append(courage_load.get_rect())
     courage_meter[each].x = padding[1]
@@ -75,7 +76,7 @@ for each in range(VIDAS):
 
 posicion_init  = (480//2, 480//2)
 Img.unicorn    = load_image("unicorn.png")
-unicorn_rect   = Img.unicorn.get_rect(center=posicion_init)
+unicorn_rect  = Img.unicorn.get_rect(center=posicion_init)
 
 
 # Loop ========================================================================
@@ -97,16 +98,19 @@ while bool(1):
         key = pygame.key.get_pressed()
 
         # Para que no se salga de la pantalla el unicornio ====================
-
-        # Reglas para que no se valla para abrriba o para la izquierda 
-        if unicorn_rect.x < 0: unicorn_rect.x = 0
-        if unicorn_rect.y < 0 : unicorn_rect.y = 0
-
-        # Reglas para que no se valla para abajo o para la derecha 
-        if unicorn_rect.x > (480-40): unicorn_rect.x = 473-40
-        if unicorn_rect.y > (480-40): unicorn_rect.y = (473-40)
         
         
+        
+        if unicorn_rect.x < 0:
+            unicorn_rect.x = 0
+        if unicorn_rect.y < 0:
+            unicorn_rect.y = 0
+ 
+        if unicorn_rect.x > check["limite"]:
+            unicorn_rect.x = check["reset"]
+        if unicorn_rect.y > check["limite"]:
+            unicorn_rect.y = check["reset"]
+
         # Teclados ============================================================
 
         if key[K_DOWN]:
@@ -122,7 +126,7 @@ while bool(1):
             copy_pos     = (unicorn_rect.x, unicorn_rect.y)
             unicorn_rect = Img.unicorn.get_rect()
             unicorn_rect.x, unicorn_rect.y = copy_pos
-            unicorn_rect = unicorn_rect.move(15, 0)
+            unicorn_rect = unicorn_rect.move(15, 0) 
             print("[*] derecha")
 
         if key[K_LEFT]:
@@ -161,8 +165,9 @@ while bool(1):
 
     # blitea el unicornio ya que este activado
     screen.blit(Img.unicorn, unicorn_rect)
-
+    #for a in [jugadora]:
+    #    a.draw(screen)
     # Updatear la pantalla ====================================================
 
     pygame.display.update()
-    clock.tick(30)
+    clock.tick(90)
