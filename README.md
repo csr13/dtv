@@ -11,7 +11,7 @@ python3.6 -m pip install -r requirements.txt
 ```
 
 ### TO DO:
-
+    * modularizar/simplificar.
     * Disenar a los enemigos.
     * El rayo para destruir a los enemigos.
     * La explosion.

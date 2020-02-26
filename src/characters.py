@@ -84,12 +84,3 @@ class Unicorn(BaseModel):
 
         screen.blit(self.image, self.rect)
         
-
-
-        
-        
-
-
-    
-
-    

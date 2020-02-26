@@ -14,11 +14,9 @@ pygame.init()
 clock = pygame.time.Clock()
 pygame.key.set_repeat(10,100)
 
-
 # Pantalla ====================================================================
 screen = pygame.display.set_mode((480, 480))
 pygame.display.set_caption("<[*_*]> Space Unicorn")
-
 
 # Texto =======================================================================
 score, score_position = writer(
@@ -45,7 +43,6 @@ for x in range(0, SCREENRECT.width, Img.background.get_width()):
     background.blit(Img.background, (x, 0))
 background_rect = background.get_rect()
 
-
 # Carga las vidas de el jugador a la pantalla. ================================
 Img.heart      = load_image("heart.png")
 courage_meter  = []
@@ -61,11 +58,11 @@ for each in range(VIDAS):
     background.blit(courage_load, courage_meter[each])
     padding[1] += 35
 
-
 # Imagenes ====================================================================
 posicion_init  = (480//2, 480//2)
 unicorn        = Unicorn("unicorn.png")
 unicorn.rect   = unicorn.image.get_rect(center=posicion_init)
+
 
 def main():
     while bool(1):
