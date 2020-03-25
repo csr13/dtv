@@ -29,17 +29,16 @@ class Virus(BaseModel):
 
     def __init__(self, img, **kwargs):
         super().__init__(img, **kwargs)
-        self.facing = random.randint(-1, 1) * random.randint(10, 13)
-        if self.facing < 0:
-            self.rect.right = SCREENRECT.right
-
-    def draw(self, screen):
-        screen.blit(self.image, self.rect)
+        self.rect[0] = random.randint(1, 620)
+        self.rect[1] = random.randint(1, 450)
+        self.facing = random.choice((-1, 1,)) * 12
+        self.rect.right = SCREENRECT.right
 
     def update(self):
         global SCREENRECT
         self.rect[0] = self.rect[0] + self.facing
         if not SCREENRECT.contains(self.rect):
+            if self.rect.x < 0:
+                return
             self.facing = -self.facing
-            self.rect.top = self.rect.bottom + 3
-            self.rect = self.rect.clamp(SCREENRECT)
+            self.rect.top = self.rect.top + 10
