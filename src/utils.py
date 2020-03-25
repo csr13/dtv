@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import os
+import random
 
 import pygame
 from PIL import Image
@@ -68,3 +69,8 @@ def flip_img(image, drop_location):
     mirrored = to_mirror.transpose(Image.FLIP_LEFT_RIGHT)
     mirrored.save(os.path.join(images_path, drop_location))
     mirrored.show()
+
+
+def random_spawn(dimensions):
+    height = dimensions.get_height()
+    width = dimension.get_width()
