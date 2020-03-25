@@ -12,10 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 from utils import load_image
 
 
-class BaseModel(object):
+class BaseModel:
     def __init__(self, img, spawn_location=None):
         self.image = load_image(img)
         if spawn_location:
@@ -23,5 +24,14 @@ class BaseModel(object):
         else:
             self.rect = self.image.get_rect()
 
+    def draw(self, screen, holder):
+        blt = screen.blit(self.image, self.rect)
+        holder.dirtyrects.append(blt)
+
+    def erase(self, screen, background, holder):
+        blt = screen.blit(background, self.rect, self.rect)
+        holder.dirtyrects.append(blt)
+
     def update(self):
+        """ Override this in each of the classes """
         pass
