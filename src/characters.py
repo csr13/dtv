@@ -13,7 +13,8 @@
 # limitations under the License.
 
 from holder import Holder
+from bars import TopBar
 from unicorn import Unicorn
 from virus import Virus
 
-__all__ = ["Holder", "Unicorn", "Virus"]
+__all__ = ["Holder", "TopBar", "Unicorn", "Virus"]
