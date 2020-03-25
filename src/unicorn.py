@@ -43,11 +43,11 @@ class Unicorn(BaseModel):
         if self.rect.y > self.check["limite"]:
             self.rect.y = self.check["reset"]
 
-    def activate_shield(self, screen):
+    def activate_shield(self, screen, holder):
         """Activate the unicorn shield"""
         shield = pygame.Surface(self.image.get_size())
         shield.fill((102, 255, 102))
-        screen.blit(shield, (self.rect.x, self.rect.y))
+        holder.dirtyrects.append(screen.blit(shield, (self.rect.x, self.rect.y)))
 
     def state(self, key, screen):
         """Capture actions for the unicorn """
@@ -91,10 +91,9 @@ class Unicorn(BaseModel):
 
         self.boundary_check()
 
-    def draw(self, screen):
+    def update(self, screen, holder):
         if self.rotate:
             self.image = pygame.transform.rotate(self.image, 90)
 
         if self.shield:
-            self.activate_shield(screen)
-        screen.blit(self.image, self.rect)
+            self.activate_shield(screen, holder)
