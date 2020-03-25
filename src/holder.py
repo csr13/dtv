@@ -15,5 +15,9 @@
 
 class Holder:
     def __init__(self, **kwargs):
-        for named, container in kwargs.items():
-            setattr(self, named, container)
+        self.dirtyrects = []
+        for k, v in kwargs.items():
+            setattr(self, k, v)
+
+    def reset_dirtyrects(self):
+        self.dirtyrects = []
