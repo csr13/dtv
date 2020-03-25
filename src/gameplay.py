@@ -37,25 +37,6 @@ screen = pygame.display.set_mode(SCREENRECT.size)
 pygame.display.set_caption("<[*_*]> Space Unicorn")
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# Texto
-
-score, score_position = writer(
-    phrase=f"Puntos: {PUNTAJE}",
-    font="ubuntumono",
-    size=20,
-    color=(102, 255, 102),
-    where={"top": 10, "right": 110},
-)
-
-vidas, vidas_position = writer(
-    phrase=f"Vidas: ",
-    font="ubuntumono",
-    size=20,
-    color=(102, 255, 102),
-    where={"top": 10, "right": 200},
-)
-
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Background
 
 Img.background = load_image("background.gif")
@@ -66,71 +47,52 @@ for x in range(0, SCREENRECT.width, Img.background.get_width()):
 background_rect = background.get_rect()
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# Load player lives, this needs to be converted to a class and inherited to
-# the Uniconrn
-
-Img.heart = load_image("heart.png")
-courage_meter = []
-padding = [2, 195]
-padding_copy = padding[:]
-
-for each in range(VIDAS):
-
-    courage_load = Img.heart
-    courage_meter.append(courage_load.get_rect())
-    courage_meter[each].x = padding[1]
-    courage_meter[each].y = padding[0]
-    background.blit(courage_load, courage_meter[each])
-    padding[1] += 35
-
-
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# Imagenes
-
-holder = Holder(unicorn_holder=[], virus_holder=[])
+# Characters
 
 unicorn = Unicorn("unicorn.png", spawn_location={"center": (640 // 2, 480 // 2)})
 
-virus = Virus("virus.gif")
+holder = Holder(unicorn_holder=[unicorn], virus_holder=[])
 
-holder.unicorn_holder.append(unicorn)
-holder.virus_holder.append(virus)
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# Main Loop
 
-# unicorn.rect = unicorn.image.get_rect(center=posicion_init)
+while bool(1):
 
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            exit(1)
 
-def main():
-    global SCREENRECT
-    while bool(1):
-        shield, rotate = (
-            False,
-            False,
-        )
+        pygame.event.pump()
+        key = pygame.key.get_pressed()
+        unicorn.state(key, screen)
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                exit(1)
+    # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    # Handle the background first
 
-            pygame.event.pump()
-            key = pygame.key.get_pressed()
-            unicorn.state(key, screen)
+    holder.dirtyrects.append(screen.blit(background, (0, 0)))
 
-            if not int(random.random() * 5):
-                holder.virus_holder.append(Virus("virus.gif"))
+    # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    # Handle Viruses
 
-        screen.blit(background, (0, 0))
-        background.blit(score, score_position)
-        background.blit(vidas, vidas_position)
+    if not int(random.random() * 42):
+        holder.virus_holder.append(Virus("virus.gif"))
 
-        holder.unicorn_holder[0].draw(screen)
+    for host in holder.virus_holder:
+        host.erase(screen, background, holder)
+        host.update()
 
-        for each in holder.virus_holder:
-            each.update()
-            each.draw(screen)
+    for each in holder.virus_holder:
+        each.draw(screen, holder)
 
-        pygame.display.update()
-        clock.tick(30)
+    # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    # Handle Unicorns
 
+    holder.unicorn_holder[0].update(screen, holder)
+    holder.unicorn_holder[0].draw(screen, holder)
 
-if __name__ == "__main__":
-    main()
+    # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    # Update game & clear rects
+
+    pygame.display.update(holder.dirtyrects)
+    holder.reset_dirtyrects()
+    clock.tick(50)
