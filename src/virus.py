@@ -18,7 +18,7 @@ import random
 import pygame
 from pygame.locals import *
 
-from config import CHECK, SCREENRECT
+from config import SCREENRECT
 from utils import load_image
 
 from basemodel import BaseModel
@@ -29,14 +29,41 @@ class Virus(BaseModel):
 
     def __init__(self, img, **kwargs):
         super().__init__(img, **kwargs)
-        self.rect[0] = random.randint(1, 620)
+        self.rect[0] = random.randint(1, 600)
         self.rect[1] = random.randint(1, 450)
-        self.facing = random.choice((-1, 1,)) * 12
+        self.facing = random.choice((-1, 1,)) * 10
         self.rect.right = SCREENRECT.right
 
+        self.dead = False
+        self.dead_time = 8
+
+    def boundary_check(self):
+        """
+        <Ch3k b0unD@ri3s>
+        """
+        if self.rect.y < 34:
+            self.rect.y = 55
+
+    def death_scene(self):
+        """
+        <Dr@m@tiK Sc3Ne>
+        """
+        position = (self.rect[0], self.rect[1])
+        self.image = load_image("x_x.gif")
+        self.rect = self.image.get_rect()
+        self.rect[0], self.rect[1] = position
+
     def update(self):
-        global SCREENRECT
+        """
+        <Mut@t3>.
+        """
+        self.boundary_check()
+        if self.dead:
+            self.death_scene()
+            self.dead_time -= 1
+
         self.rect[0] = self.rect[0] + self.facing
+
         if not SCREENRECT.contains(self.rect):
             if self.rect.x < 0:
                 return

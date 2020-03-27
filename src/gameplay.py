@@ -12,15 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import math
 import os
 import random
+import time
 import pdb
 
 import pygame
 from pygame.locals import *
 
 from characters import *
-from config import PUNTAJE, SCREENRECT, VIDAS
+from config import SCREENRECT
 from utils import load_image, Img, writer
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -34,7 +36,7 @@ pygame.key.set_repeat(10, 100)
 # Pantalla
 
 screen = pygame.display.set_mode(SCREENRECT.size)
-pygame.display.set_caption("<[*_*]> Space Unicorn")
+pygame.display.set_caption("🖥 Inf3Kt!0n 🦄")
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Background
@@ -47,16 +49,24 @@ for x in range(0, SCREENRECT.width, Img.background.get_width()):
 background_rect = background.get_rect()
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# Characters
+# The key master, holder.
 
-unicorn = Unicorn("unicorn.png", spawn_location={"center": (640 // 2, 480 // 2)})
-
-holder = Holder(unicorn_holder=[unicorn], virus_holder=[])
+holder = Holder(
+    unicorn=Unicorn("unicorn.png", spawn_location={"midleft": (50, 640 // 2)}),
+    virus_holder=[],
+    stats=StatsBar(),
+)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Main Loop
 
-while bool(1):
+# Points are calculated by the amount of seconds that the player lasted in the
+# gameplay, from the moment the loop starts, till the moment the player gets hit
+
+start_points = math.ceil(time.time())
+virus_killed = 0
+
+while holder.unicorn.alive == True:
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -64,39 +74,55 @@ while bool(1):
 
         pygame.event.pump()
         key = pygame.key.get_pressed()
-        unicorn.state(key, screen)
+        holder.unicorn.state(key, screen)
 
     # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     # Handle the background first
 
     holder.dirtyrects.append(screen.blit(background, (0, 0)))
+    holder.stats.generate(screen, holder.unicorn.shield_energy, holder)
 
     # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     # Handle Viruses
 
-    if not int(random.random() * 42):
+    if not int(random.random() * 40):
         holder.virus_holder.append(Virus("virus.gif"))
 
     for host in holder.virus_holder:
-        host.erase(screen, background, holder)
         host.update()
         host.draw(screen, holder)
 
     # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    # Detect if you got hit.
+    # Detect collisions
 
-    hit = holder.unicorn_holder[0].rect.collidelist(holder.virus_holder)
-    if hit != -1:
-        virus = holder.virus_holder[hit]
-        # display a you lost message here and animate the death of the unicorn,
-        # make it gory.
-        exit(0)
+    x_x = holder.unicorn.rect.collidelist(holder.virus_holder)
+    if x_x != -1:
+        if holder.virus_holder[x_x].dead:
+            pass
+        elif holder.unicorn.shield == True:
+            virus_killed += 1
+            holder.virus_holder[x_x].dead = True
+        elif holder.virus_holder[x_x].dead == False:
+            holder.unicorn.death_scene()
+            holder.unicorn.dead = True
 
     # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     # Handle Unicorns
 
-    holder.unicorn_holder[0].update(screen, holder)
-    holder.unicorn_holder[0].draw(screen, holder)
+    holder.unicorn.update(screen, holder)
+    holder.unicorn.draw(screen, holder)
+
+    # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    # Check who is dead.
+
+    for virus in holder.virus_holder:
+        if virus.dead and virus.dead_time < 0:
+            virus.erase(screen, background, holder)
+
+    if holder.unicorn.dead and holder.unicorn.dead_time < 0:
+        # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        # Have the stats ready to be displayed here.
+        holder.unicorn.alive = False
 
     # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     # Update game & clear rects

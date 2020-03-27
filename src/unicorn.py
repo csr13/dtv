@@ -25,32 +25,58 @@ from basemodel import BaseModel
 class Unicorn(BaseModel):
     """
     Main player class
-    
-    boundary_check; checks for boundaries
     """
 
-    check = {"limite": (480 - 40), "reset": (473 - 40)}
+    def __init__(self, img, **kwargs):
+        super().__init__(img, **kwargs)
+        self.dead = False
+        self.alive = True
+
+        self.shield = False
+        self.shield_energy = 250
+
+        self.dead_time = 6
+        self.check = {"limite": (450 - 30), "reset": (480 - 50)}
 
     def boundary_check(self):
-        """Check the boundaries of the rect."""
+        """
+        Check the boundaries of the rect.
+        """
         if self.rect.x < 0:
-            self.rect.x = 0
+            self.rect.x = 10
         if self.rect.y < 34:
-            self.rect.y = 35
+            self.rect.y = 45
 
         if self.rect.x > self.check["limite"]:
             self.rect.x = self.check["reset"]
         if self.rect.y > self.check["limite"]:
             self.rect.y = self.check["reset"]
 
+    def shield_ok(self):
+        if self.shield_energy <= 0:
+            return False
+        return True
+
+    def regenerate_shield_energy(self):
+        if self.shield_energy < 250 and self.shield == False:
+            self.shield_energy += 0.05
+
     def activate_shield(self, screen, holder):
-        """Activate the unicorn shield"""
-        shield = pygame.Surface(self.image.get_size())
-        shield.fill((102, 255, 102))
-        holder.dirtyrects.append(screen.blit(shield, (self.rect.x, self.rect.y)))
+        """
+        Activate the unicorn shield
+        """
+        if self.shield_ok():
+            shield = pygame.Surface(self.image.get_size())
+            shield.fill((102, 255, 102))
+            shield_blit = screen.blit(shield, (self.rect.x, self.rect.y))
+            holder.dirtyrects.append(shield_blit)
+            self.shield_energy -= 1
 
     def state(self, key, screen):
-        """Capture actions for the unicorn """
+        """
+        Capture actions for the unicorn
+        """
+
         self.shield = False
         self.rotate = False
 
@@ -58,12 +84,10 @@ class Unicorn(BaseModel):
             exit(1)
 
         if key[K_DOWN]:
-            self.rect = self.rect.move(0, 15)
-            print("[*] abajo")
+            self.rect = self.rect.move(0, 20)
 
         if key[K_UP]:
-            self.rect = self.rect.move(0, -15)
-            print("[*] arriba")
+            self.rect = self.rect.move(0, -20)
 
         if key[K_RIGHT]:
             self.image = load_image("unicorn.png")
@@ -71,7 +95,6 @@ class Unicorn(BaseModel):
             self.rect = self.image.get_rect()
             self.rect.x, self.rect.y = copy_pos
             self.rect = self.rect.move(15, 0)
-            print("[*] derecha")
 
         if key[K_LEFT]:
             self.image = load_image("left_unicorn.png")
@@ -79,21 +102,37 @@ class Unicorn(BaseModel):
             self.rect = self.image.get_rect()
             self.rect.x, self.rect.y = copy_pos
             self.rect = self.rect.move(-15, 0)
-            print("[*] izquierda")
 
         if key[K_SPACE]:
-            self.shield = True
-            print("[*] escudo protector activado")
-
-        if key[K_r]:
+            if self.shield_energy <= 0:
+                self.shield = False
+            else:
+                self.shield = True
             self.rotate = True
-            print("[*] rotate")
+            print("[*] escudo protector activado")
 
         self.boundary_check()
 
+    def death_scene(self):
+        """
+        Dramatic scene.
+        """
+        position = (self.rect[0], self.rect[1])
+        self.image = load_image("x_x.gif")
+        self.rect = self.image.get_rect()
+        self.rect[0], self.rect[1] = position
+
     def update(self, screen, holder):
+        """
+        Update
+        """
+        if self.shield:
+            self.activate_shield(screen, holder)
+
+        if self.dead:
+            self.dead_time -= 1
+
         if self.rotate:
             self.image = pygame.transform.rotate(self.image, 90)
 
-        if self.shield:
-            self.activate_shield(screen, holder)
+        self.regenerate_shield_energy()
