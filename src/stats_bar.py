@@ -35,7 +35,7 @@ class StatsBar:
     def __init__(self):
         self.energy = 0
         self.lives = 0
-        self.points = {"time_points_start": time.time(), "time_points_end": None}
+        self.game_start = time.time()
         self.writer = writer
 
     def get_current_points(self):
@@ -43,14 +43,13 @@ class StatsBar:
         This is ugly but otherwise if we increase complexity it might 'leak' 
         out points from the player x_x
         """
-        return divmod(
-            (math.ceil(time.time()) - self.points["times_point_start"]), 1000
-        )[1]
+        return math.ceil(divmod((math.ceil(time.time()) - self.game_start), 1000)[1])
 
     def generate_energy_bar(self, screen, energy, holder):
         """
         Generate the energy bar
         """
+        width = energy
         energy_text, energy_position = self.writer(
             phrase=f"energy >> {math.ceil(energy)} ",
             font="ubuntumono",
@@ -58,12 +57,19 @@ class StatsBar:
             color=(255, 255, 51),
             where={"top": 15, "right": 98},
         )
-        width = energy
+        points_text, points_position = self.writer(
+            phrase=f"{self.get_current_points()} ",
+            font="ubuntumono",
+            size=12,
+            color=(255, 255, 51),
+            where={"top": 15, "right": 780},
+        )
         energy_bar_rect = pygame.Rect(0, 0, energy, 15)
         energy_bar_bkgd = pygame.Surface(energy_bar_rect.size)
         energy_bar_bkgd.fill((0, 255, 0))
 
         holder.dirtyrects.append(screen.blit(energy_text, energy_position))
+        holder.dirtyrects.append(screen.blit(points_text, points_position))
         holder.dirtyrects.append(screen.blit(energy_bar_bkgd, (100, 15)))
 
     def get_final_points(self):
