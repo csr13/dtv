@@ -47,25 +47,10 @@ class StatsBar:
             (math.ceil(time.time()) - self.points["times_point_start"]), 1000
         )[1]
 
-    def generate_background(self, screen, holder):
-        """
-        Generate the background for the stat bar.
-        """
-        background_rect = pygame.Rect(0, 0, SCREENRECT.width, 50)
-        background = pygame.Surface(background_rect.size)
-        background.fill((0, 0, 0))
-        pygame.draw.line(background, (120, 0, 0), (800, 49), (0, 49))
-        pygame.draw.line(background, (120, 0, 0), (800, 0), (0, 0))
-        pygame.draw.line(background, (120, 0, 0), (799, 49), (799, 0))
-        pygame.draw.line(background, (120, 0, 0), (0, 49), (0, 0))
-        holder.dirtyrects.append(screen.blit(background, (0, 0)))
-
     def generate_energy_bar(self, screen, energy, holder):
         """
         Generate the energy bar
         """
-        # generate text
-
         energy_text, energy_position = self.writer(
             phrase=f"energy >> {math.ceil(energy)} ",
             font="ubuntumono",
@@ -73,7 +58,6 @@ class StatsBar:
             color=(255, 255, 51),
             where={"top": 15, "right": 98},
         )
-        # generate bar
         width = energy
         energy_bar_rect = pygame.Rect(0, 0, energy, 15)
         energy_bar_bkgd = pygame.Surface(energy_bar_rect.size)
@@ -87,7 +71,7 @@ class StatsBar:
         return f"Final score :: {final_points}"
 
     def generate(self, screen, energy, holder):
-        self.generate_background(screen, holder)
+        #self.generate_background(screen, holder)
         self.generate_energy_bar(screen, energy, holder)
 
     def update(self, shield_energy, lives=None):
