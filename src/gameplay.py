@@ -60,12 +60,6 @@ holder = Holder(
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Main Loop
 
-# Points are calculated by the amount of seconds that the player lasted in the
-# gameplay, from the moment the loop starts, till the moment the player gets hit
-
-start_points = math.ceil(time.time())
-virus_killed = 0
-
 while holder.unicorn.alive == True:
 
     for event in pygame.event.get():
@@ -100,7 +94,6 @@ while holder.unicorn.alive == True:
         if holder.virus_holder[x_x].dead:
             pass
         elif holder.unicorn.shield == True:
-            virus_killed += 1
             holder.virus_holder[x_x].dead = True
         elif holder.virus_holder[x_x].dead == False:
             holder.unicorn.death_scene()
