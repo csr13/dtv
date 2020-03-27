@@ -36,7 +36,7 @@ pygame.key.set_repeat(10, 100)
 # Pantalla
 
 screen = pygame.display.set_mode(SCREENRECT.size)
-pygame.display.set_caption("🖥 Inf3Kt!0n 🦄")
+pygame.display.set_caption(" Inf3Kt!0n ")
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Background
