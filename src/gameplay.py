@@ -84,6 +84,7 @@ while bool(1):
 
     # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     # Detect if you got hit.
+
     hit = holder.unicorn_holder[0].rect.collidelist(holder.virus_holder)
     if hit != -1:
         virus = holder.virus_holder[hit]
