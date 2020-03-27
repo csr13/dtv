@@ -80,9 +80,16 @@ while bool(1):
     for host in holder.virus_holder:
         host.erase(screen, background, holder)
         host.update()
+        host.draw(screen, holder)
 
-    for each in holder.virus_holder:
-        each.draw(screen, holder)
+    # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    # Detect if you got hit.
+    hit = holder.unicorn_holder[0].rect.collidelist(holder.virus_holder)
+    if hit != -1:
+        virus = holder.virus_holder[hit]
+        # display a you lost message here and animate the death of the unicorn,
+        # make it gory.
+        exit(0)
 
     # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     # Handle Unicorns
