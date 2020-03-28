@@ -54,20 +54,6 @@ class Unicorn(BaseModel):
             return False
         return True
 
-    def life_ok(self):
-        """
-        This function checks to see the life energy levels,
-        """
-
-        # If the Unicorn has no lifes
-        #   Send a False signal
-        # Otherwise
-        #   Send a True signal
-
-        if self.life <= 0:
-            return False
-        return True
-
     def regenerate_life(self):
         """
         Regenerates the energy of the unicorn.
@@ -77,8 +63,8 @@ class Unicorn(BaseModel):
         #    1) The energy of the shield is less than 250.
         #    2) The shield's usage signal is off.
 
-        if self.shield_energy < 250 and self.shield == False:
-            self.shield_energy += 0.05
+        if self.life < 250:
+            self.life += 0.025
 
     def shield_ok(self):
         """
