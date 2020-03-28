@@ -156,7 +156,7 @@ while holder.unicorn.alive == bool(1):
         #            unicorn.update() (called later) method which indicates that
         #            the unicorn death scene count needs to decrement by one.
         #
-        #       1.2) Initiate te unicorn death scene.
+        #       1.2) Initiate the unicorn death scene.
         #
         # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         #
