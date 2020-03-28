@@ -29,43 +29,46 @@ class Virus(BaseModel):
 
     def __init__(self, img, **kwargs):
         super().__init__(img, **kwargs)
-        self.rect[0] = random.randint(1, 600)
-        self.rect[1] = random.randint(1, 450)
+        self.rect[0] = 0
+        self.rect[1] = random.randint(1, 420)
         self.facing = random.choice((-1, 1,)) * 10
         self.rect.right = SCREENRECT.right
-
         self.dead = False
-        self.dead_time = 8
+        self.death_scene_time = 30
 
-    def boundary_check(self):
+    def get_position(self):
         """
-        <Ch3k b0unD@ri3s>
+        <G3t p0$iti0n 0f h0$t>
         """
-        if self.rect.y < 34:
-            self.rect.y = 55
+        return (
+            self.rect[0],
+            self.rect[1],
+        )
 
     def death_scene(self):
         """
         <Dr@m@tiK Sc3Ne>
         """
-        position = (self.rect[0], self.rect[1])
+        position = self.get_position()
         self.image = load_image("x_x.gif")
         self.rect = self.image.get_rect()
         self.rect[0], self.rect[1] = position
 
-    def update(self):
+    def update(self, holder):
         """
         <Mut@t3>.
         """
-        self.boundary_check()
+        holder_index = holder.virus_holder.index(self.rect)
+        if self.rect.y < 50:
+            self.rect[1] -= 80
+
         if self.dead:
             self.death_scene()
-            self.dead_time -= 1
+            self.death_scene_time -= 1
+            self.rect[1] -= 1
 
         self.rect[0] = self.rect[0] + self.facing
 
         if not SCREENRECT.contains(self.rect):
-            if self.rect.x < 0:
-                return
+            holder.virus_holder.pop(holder_index)
             self.facing = -self.facing
-            self.rect.top = self.rect.top + 10

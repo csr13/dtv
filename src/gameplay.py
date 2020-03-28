@@ -36,7 +36,7 @@ pygame.key.set_repeat(10, 100)
 # Pantalla
 
 screen = pygame.display.set_mode(SCREENRECT.size)
-pygame.display.set_caption(" Inf3Kt!0n ")
+pygame.display.set_caption(" Slip the Virus ")
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Background
@@ -60,66 +60,70 @@ holder = Holder(
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Main Loop
 
-while holder.unicorn.alive == True:
+while holder.unicorn.alive == bool(1):
 
+    # Check to see if the rest of the loop will execute
+    if holder.unicorn.dead_scene_time <= 0:
+        holder.unicorn.alive = False
+
+    # Handle the background first
+    holder.dirtyrects.append(screen.blit(background, (0, 0)))
+
+    # Evaluate vents & keys pressed
     for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            exit(1)
-
         pygame.event.pump()
         key = pygame.key.get_pressed()
         holder.unicorn.state(key, screen)
 
-    # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    # Handle the background first
+        if key[K_ESCAPE]:
+            exit(1)
 
-    holder.dirtyrects.append(screen.blit(background, (0, 0)))
-    holder.stats.generate(screen, holder.unicorn.shield_energy, holder)
+        if event.type == pygame.QUIT:
+            exit(1)
 
-    # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    # Handle Viruses
+    # Detect collisions
+    x_x = holder.unicorn.rect.collidelist(holder.virus_holder)
 
-    if not int(random.random() * 40):
+    if x_x != -1:
+
+        if holder.virus_holder[x_x].dead:
+            pass
+
+        elif holder.unicorn.shield == True:
+            holder.virus_holder[x_x].dead = True
+            print("Nos chingamos a el virus ->", holder.virus_holder[x_x])
+
+        elif holder.unicorn.shield == False:
+            if not holder.unicorn.health_ok():
+                holder.unicorn.dead = True
+                holder.unicorn.death_scene()
+            else:
+                holder.unicorn.hit = True
+
+        elif holder.virus_holder[x_x].dead == False:
+            pass
+
+    # Update Viruses
+    if not int(random.random() * 12):
         holder.virus_holder.append(Virus("virus.gif"))
 
     for host in holder.virus_holder:
-        host.update()
+        host.update(holder)
+
+    for host in holder.virus_holder:
         host.draw(screen, holder)
 
-    # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    # Detect collisions
+    for host in holder.virus_holder:
+        if host.dead and host.death_scene_time < 0:
+            host.erase(screen, background, holder)
 
-    x_x = holder.unicorn.rect.collidelist(holder.virus_holder)
-    if x_x != -1:
-        if holder.virus_holder[x_x].dead:
-            pass
-        elif holder.unicorn.shield == True:
-            holder.virus_holder[x_x].dead = True
-        elif holder.virus_holder[x_x].dead == False:
-            holder.unicorn.death_scene()
-            holder.unicorn.dead = True
-
-    # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    # Handle Unicorns
-
+    # Update Unicorn
     holder.unicorn.update(screen, holder)
     holder.unicorn.draw(screen, holder)
+    # Update StatsBar
+    holder.stats.update(screen, holder)
 
-    # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    # Check who is dead.
-
-    for virus in holder.virus_holder:
-        if virus.dead and virus.dead_time < 0:
-            virus.erase(screen, background, holder)
-
-    if holder.unicorn.dead and holder.unicorn.dead_time < 0:
-        # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        # Have the stats ready to be displayed here.
-        holder.unicorn.alive = False
-
-    # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    # Update game & clear rects
-
+    # Update display
     pygame.display.update(holder.dirtyrects)
     holder.reset_dirtyrects()
-    clock.tick(50)
+    clock.tick(69)

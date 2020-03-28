@@ -24,65 +24,101 @@ from utils import load_image
 
 from basemodel import BaseModel
 from config import SCREENRECT
+from characters import Holder
 from utils import writer
 
 
-class StatsBar:
+class StatsBar(object):
     """
     Stats Bar class
     """
 
     def __init__(self):
-        self.energy = 0
-        self.lives = 0
         self.game_start = time.time()
         self.writer = writer
 
-    def get_current_points(self):
+    def get_current_game_time(self):
         """
         This is ugly but otherwise if we increase complexity it might 'leak' 
-        out points from the player x_x
+        out miliseconds from game time.
         """
+
         return math.ceil(divmod((math.ceil(time.time()) - self.game_start), 1000)[1])
-
-    def generate_energy_bar(self, screen, energy, holder):
-        """
-        Generate the energy bar
-        """
-        width = energy
-        energy_text, energy_position = self.writer(
-            phrase=f"energy >> {math.ceil(energy)} ",
-            font="ubuntumono",
-            size=12,
-            color=(255, 255, 51),
-            where={"top": 15, "right": 98},
-        )
-        points_text, points_position = self.writer(
-            phrase=f"{self.get_current_points()} ",
-            font="ubuntumono",
-            size=12,
-            color=(255, 255, 51),
-            where={"top": 15, "right": 780},
-        )
-        energy_bar_rect = pygame.Rect(0, 0, energy, 15)
-        energy_bar_bkgd = pygame.Surface(energy_bar_rect.size)
-        energy_bar_bkgd.fill((0, 255, 0))
-
-        holder.dirtyrects.append(screen.blit(energy_text, energy_position))
-        holder.dirtyrects.append(screen.blit(points_text, points_position))
-        holder.dirtyrects.append(screen.blit(energy_bar_bkgd, (100, 15)))
 
     def get_final_points(self):
         final_points = self.get_current_points()
         return f"Final score :: {final_points}"
 
-    def generate(self, screen, energy, holder):
-        #self.generate_background(screen, holder)
-        self.generate_energy_bar(screen, energy, holder)
+    def generate_game_time(self, screen, holder):
+        """
+        Generates points and appends a blit to be updated.
+        """
 
-    def update(self, shield_energy, lives=None):
+        points_text, points_position = self.writer(
+            phrase=f"{self.get_current_game_time()} ",
+            font="ubuntumono",
+            size=12,
+            color=(255, 255, 51),
+            where={"top": 17, "right": 780},
+        )
+        holder.dirtyrects.append(screen.blit(points_text, points_position))
+
+    def generate_energy_bar_text(self, screen, holder):
         """
-        We should update the width of the rect bar that represents the shields energy
-        We should create a couple of properties 
+        Generates energy bar and appends a blit to be updated.
         """
-        pass
+
+        energy_text, energy_position = self.writer(
+            phrase=f"Shield {math.ceil(holder.unicorn.shield_energy)} ",
+            font="ubuntumono",
+            size=12,
+            color=(255, 255, 51),
+            where={"top": 16, "right": 98},
+        )
+        holder.dirtyrects.append(screen.blit(energy_text, energy_position))
+
+    def generate_energy_bar(self, screen, holder):
+        """
+        Generate the energy bar append its blit to be updated.
+        """
+
+        energy = holder.unicorn.shield_energy
+        energy_bar_rect = pygame.Rect(0, 0, energy, 15)
+        energy_bar_bkgd = pygame.Surface(energy_bar_rect.size)
+        energy_bar_bkgd.fill((0, 255, 0))
+        holder.dirtyrects.append(screen.blit(energy_bar_bkgd, (100, 15)))
+
+    def generate_unicorn_life_text(self, screen, holder):
+        """
+        This feauture is not available at the moment.
+        """
+
+        lives_text, lives_text_position = self.writer(
+            phrase=f"Energy {holder.unicorn.life}",
+            font="ubuntumono",
+            size=12,
+            color=(255, 255, 255),
+            where={"top": 33, "right": 98},
+        )
+        holder.dirtyrects.append(screen.blit(lives_text, lives_text_position))
+
+    def generate_unicorn_life_bar(self, screen, holder):
+        """
+        Generate the unicorns life bar
+        """
+        life = holder.unicorn.life
+        life_bar_rect = pygame.Rect(0, 0, life, 15)
+        life_bar_bkgd = pygame.Surface(life_bar_rect.size)
+        life_bar_bkgd.fill((0, 0, 220))
+        holder.dirtyrects.append(screen.blit(life_bar_bkgd, (100, 35)))
+
+    def update(self, screen, holder):
+        """
+        Update everyting.
+        """
+
+        self.generate_unicorn_life_text(screen, holder)
+        self.generate_unicorn_life_bar(screen, holder)
+        self.generate_energy_bar_text(screen, holder)
+        self.generate_energy_bar(screen, holder)
+        self.generate_game_time(screen, holder)
