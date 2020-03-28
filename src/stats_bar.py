@@ -36,6 +36,7 @@ class StatsBar(object):
     def __init__(self):
         self.game_start = time.time()
         self.writer = writer
+        self.viruses_eliminated = 0
 
     def get_current_game_time(self):
         """
@@ -44,10 +45,6 @@ class StatsBar(object):
         """
 
         return math.ceil(divmod((math.ceil(time.time()) - self.game_start), 1000)[1])
-
-    def get_final_points(self):
-        final_points = self.get_current_points()
-        return f"Final score :: {final_points}"
 
     def generate_game_time(self, screen, holder):
         """
@@ -94,7 +91,7 @@ class StatsBar(object):
         """
 
         lives_text, lives_text_position = self.writer(
-            phrase=f"Energy {holder.unicorn.life}",
+            phrase=f"Energy {math.ceil(holder.unicorn.life)}",
             font="ubuntumono",
             size=12,
             color=(255, 255, 255),
@@ -106,8 +103,13 @@ class StatsBar(object):
         """
         Generate the unicorns life bar
         """
-        life = holder.unicorn.life
-        life_bar_rect = pygame.Rect(0, 0, life, 15)
+        life = math.ceil(holder.unicorn.life)
+        if life < 1:
+            life = 1
+        try:
+            life_bar_rect = pygame.Rect(0, 0, life, 15)
+        except:
+            return 
         life_bar_bkgd = pygame.Surface(life_bar_rect.size)
         life_bar_bkgd.fill((0, 0, 220))
         holder.dirtyrects.append(screen.blit(life_bar_bkgd, (100, 35)))
