@@ -31,4 +31,9 @@ python3.6 src/gameplay.py
 
 * [esc-key] - quit
 
+* [pause-key] - pause for 5 seconds; this, like everything, can be toggled with.
+
+
+I was going to write a bunch of lines u can toggle to change how the game acts, but then I realized you can actually toggle with everything :beer:
+
 
