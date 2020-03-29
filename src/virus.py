@@ -10,6 +10,8 @@
 # limitations under the License.
 
 import os
+import math
+
 import random
 import pygame
 from pygame.locals import *
@@ -29,8 +31,30 @@ class Virus(BaseModel):
         self.rect[1] = random.randint(1, 420)
         self.facing = random.choice((-1, 1,)) * 10
         self.rect.right = SCREENRECT.right
+        self.replication_frequency = 0
         self.dead = bool(0)
         self.death_scene_time = 30
+
+    @classmethod
+    def replicate(host, rate, holder):
+        """
+        <R3pliC@t3 S3lf> - difficulty level
+        """
+
+        # Increment the replication rate each minute of gameplay
+        # for three minutes, after that set the difficulty to legendary
+
+        if rate < 60:
+            difficulty = 19  # rookie
+        elif 60 < rate < 120:
+            difficulty = 10  # medium
+        elif 120 < rate < 180:
+            difficulty = 7  # very hard
+        else:
+            difficulty = 3  # legendary
+
+        if not int(random.random() * difficulty):
+            holder.virus_holder.append(Virus("virus.gif"))
 
     def get_position(self):
         """
@@ -65,18 +89,25 @@ class Virus(BaseModel):
         if self.dead:
             self.death_scene_time -= 1
 
-            # This is so that when the player hits the enemies 
+            # This is so that when the player hits the enemies
             # their guts just 'bounce' off.
-            
+
             if not hasattr(self, "impact"):
                 self.impact = random.choice(["up", "down"])
-            
+
             if self.impact == "down":
-                self.rect[1], self.rect[0] = ((self.rect[1] + 6), (self.rect[0] + 10),)
+                self.rect[1], self.rect[0] = (
+                    (self.rect[1] + 6),
+                    (self.rect[0] + 10),
+                )
             else:
-                self.rect[1], self.rect[0] = ((self.rect[1] - 6), (self.rect[0] + 10),)
-        
+                self.rect[1], self.rect[0] = (
+                    (self.rect[1] - 6),
+                    (self.rect[0] + 10),
+                )
+
         self.rect[0] = self.rect[0] + self.facing
+
         if not SCREENRECT.contains(self.rect):
             holder.virus_holder.pop(holder_index)
             self.facing = -self.facing
