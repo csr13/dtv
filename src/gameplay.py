@@ -1,3 +1,4 @@
+#!/usr/bin/env python3.6
 # Copyright 2020 C. Sanchez Roman
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -57,19 +58,20 @@ holder = Holder(
 
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 #
-# Main Loop
+# Main Game Loop
 #
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-
 while holder.unicorn.alive == bool(1):
-    
+
     # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     #
     # Check to see if the rest of the loop will execute, this happens because
-    # we are checking to see if the death scene has a;ready happend.
-    # here we cset the final pointage, we can that to be the first otherwise we
-    # can leak points, the we send the kill signal to the main loop.
+    # we are checking to see if the death scene has already been signaled.
+    #
+    #   1) Set the final pointage,
+    #
+    #   2) the we send the kill signal to the main loop.
     #
     # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
@@ -99,12 +101,24 @@ while holder.unicorn.alive == bool(1):
         if key[K_ESCAPE]:
             exit(1)
 
+        if key[K_PAUSE]:
+            pause_text, pause_text_position = writer(
+                phrase="PAUSE",
+                font="ubuntumono",
+                size=30,
+                color=(0, 255, 0),
+                where={"center": (400, 200)},
+            )
+            holder.dirtyrects.append(screen.blit(pause_text, pause_text_position))
+            pygame.display.update()
+            pygame.time.wait(5000)
+
         if event.type == pygame.QUIT:
             exit(1)
 
     # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     #
-    # Here, within this if block we index the virus that collided with
+    # Here, within this if block, we index the virus that collided with
     # the user object, the Unicorn.
     #
     # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
@@ -116,7 +130,7 @@ while holder.unicorn.alive == bool(1):
     # If a collision was found, then execute the following
     #
     # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    
+
     if x_x != -1:
 
         # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
@@ -125,20 +139,24 @@ while holder.unicorn.alive == bool(1):
         # nothing more to do here.
         #
         # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        
+
         if holder.virus_holder[x_x].dead:
             pass
 
         # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         #
         # If the unicorn had its shield activated when it collided with the virus
+        #   
+        #   1) Initiate the death scene.  
         #
-        #   1) Signal the virus that it needs to be removed
-        #   2) Increment the viruses eliminated count by one.
+        #   2) Establish that this instance is dead.
+        #
+        #   3) Increment the viruses eliminated count by one.
         #
         # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
         elif holder.unicorn.shield == True:
+            holder.virus_holder[x_x].death_scene()
             holder.virus_holder[x_x].dead = True
             holder.stats.viruses_eliminated += 1
 
@@ -151,7 +169,7 @@ while holder.unicorn.alive == bool(1):
         #
         #   1) If the unicorn has no health.
         #
-        #       1.1) Set the dead status of the unicorn to True,
+        #       1.1) Set the dead status of the unicorn to True.
         #            This does a couple of things, first it sends a signal to the
         #            unicorn.update() (called later) method which indicates that
         #            the unicorn death scene count needs to decrement by one.
@@ -161,7 +179,7 @@ while holder.unicorn.alive == bool(1):
         # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         #
         #   2) If the unicorn has health, then a couple of things will happen.
-        #       
+        #
         #       2.1) Send a signal to the unicorn instance that a hit occured.
         #            This signal decrements the instance health by 5 points.
         #
@@ -181,32 +199,36 @@ while holder.unicorn.alive == bool(1):
     # Update Viruses
     #
     # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    # 
+    #
     # First we roll some odds for if a new virus will appear.
     #
-    #   1) append a new virus instance to the virus holder list.
+    #   1) Append a new virus instance to the virus holder list.
     #
     # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     #
-    # First loop is important, we update all the viruses, this does a couple of 
+    # First loop is important, we update all the viruses, this does a couple of
     # things.
     #
     #   1) It checks the boundaries of the virus y axis with respect to the screen
+    #
     #   2) It checks for a signal to see if the virus is dead and we need to
     #      initiate a decremental count for the death scene duriation.
     #   3) It increments the virus instance x coordinate, for movement.
+    #
     #   4) It checks to see if there are any viruses off the screen, and pops them
     #      it also directs the virus.
     #
     # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     #
-    # Second loop draws all the updated batch of viruses, using it draw method
-    # 
+    # Second loop draws all the updated batch of viruses, using it's draw method.
+    #
     # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     #
     # Third loop checks does a couple of things
-    #   1) It checks to see if the virus is dead, and if its time scene count
-    #      has finished, and if True then;
+    #
+    #   1) It checks to see if the virus is dead and if it's death scene count
+    #      time has finished, if True then;
+    #
     #       1.1) It calls its own method to erase the instance from the screen.
     #
     # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
@@ -243,18 +265,19 @@ while holder.unicorn.alive == bool(1):
 
     # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     #
-    # Update display by passing the list of dirty rects collecred by each of the
+    # Update display by passing the list of dirty rects collected by each of the
     # draw and earase methods of the instances that where manipulated.
-    # Set frames pre second with clock.tick, by default, nice.
-    # 
+    # Set frames pre second with clock.tick.
+    #
     # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
     pygame.display.update(holder.dirtyrects)
     holder.reset_dirtyrects()
     clock.tick(69)
 
+
 print(
-f"""
+    f"""
 + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + 
 
 Game stats (*_*)

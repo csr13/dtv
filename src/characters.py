@@ -17,4 +17,7 @@ from stats_bar import StatsBar
 from unicorn import Unicorn
 from virus import Virus
 
+# The objects inside this list are imported with *, like this.
+#   from <this_module> import *
+
 __all__ = ["Holder", "StatsBar", "Unicorn", "Virus"]

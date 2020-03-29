@@ -21,10 +21,13 @@ from utils import load_image
 
 
 class Unicorn(BaseModel):
-    """Unicorn Class"""
+    """
+    Unicorn Class
+    """
 
     def __init__(self, img, **kwargs):
         super().__init__(img, **kwargs)
+
         self.alive = True
         self.life = 250
         self.dead = False
@@ -43,12 +46,18 @@ class Unicorn(BaseModel):
         # Return a tuple of (x, y) coordinates representing the current
         # location of the Unicorn within the screen.
 
-        return self.rect[0], self.rect[1]
+        return (
+            self.rect[0],
+            self.rect[1],
+        )
 
     def health_ok(self):
         """
         Checks the unicorn health.
         """
+
+        # Return False if the instance has no life left.
+        # Return True is the instance has life left
 
         if self.life <= 0:
             return False
@@ -59,22 +68,19 @@ class Unicorn(BaseModel):
         Regenerates the energy of the unicorn.
         """
 
-        # Increment the energy of the shield by 0.05 if:
-        #    1) The energy of the shield is less than 250.
-        #    2) The shield's usage signal is off.
+        # Increment the instance life by 0.025 if:
+        #    1) Life is less than 250.
 
         if self.life < 250:
             self.life += 0.025
 
     def shield_ok(self):
         """
-        This function checks to see the shield energy level,
+        Checks shield energy.
         """
 
-        # If the shield has no energy
-        #   Send a False signal
-        # Otherwise
-        #   Send a True signal
+        # Return False if the shield has no energy left.
+        # Return True if the shield has energy left.
 
         if self.shield_energy <= 0:
             return False
@@ -85,12 +91,12 @@ class Unicorn(BaseModel):
         Regenerates the energy of the shield.
         """
 
-        # Increment the energy of the shield by 0.05 if:
+        # Increment the energy of the shield by 0.036 if:
         #    1) The energy of the shield is less than 250.
         #    2) The shield's usage signal is off.
 
         if self.shield_energy < 250 and self.shield == False:
-            self.shield_energy += 0.05
+            self.shield_energy += 0.036
 
     def activate_shield(self, screen, holder):
         """
@@ -173,6 +179,12 @@ class Unicorn(BaseModel):
         """
         Dramatic scene.
         """
+        # All this function does is:
+        #   1) Get the position of the current instance.
+        #   2) Swap the intial image.
+        #   3) Get a rect from the image
+        #   4) Set the previous rect position to the new
+        #      rect, so that it maintains the same position
 
         position = (self.rect[0], self.rect[1])
         self.image = load_image("x_x.gif")
@@ -181,25 +193,38 @@ class Unicorn(BaseModel):
 
     def update(self, screen, holder):
         """
-        Update
+        Update things.
         """
+
+        # This checks to see if the instance is dead,
+        # if so, this means the death scene has been
+        # initiated. Therefore we need to decrement
+        # it's duration so that the game can end.
+
         if self.dead:
             self.dead_scene_time -= 1
-        # if the unicorn was hit deduct a life from its lives,
-        # This is represented in the Stats Bar.
+
+        # Deduct points from the instance life,
+        # Set the hit flag to False, otherwise
+        # it will keep decrementing life.
 
         if self.hit:
             self.life -= 5
             self.hit = False
 
-        # If there was a shield signal from state, perform the action.
+        # If there was a shield signal from state,
+        # call the activate_shield .
 
         if self.shield:
             self.activate_shield(screen, holder)
 
-        # If there was a rotate signal from state, perform the action.
+        # If there was a rotate signal from state
+        # rotate the image by 90 degrees
+
         if self.rotate:
             self.image = pygame.transform.rotate(self.image, 90)
+
+        # Regenerate
 
         self.regenerate_shield_energy()
         self.regenerate_life()

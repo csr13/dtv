@@ -20,9 +20,3 @@ from pygame import Rect
 SCREENRECT = Rect(0, 0, 800, 480)
 
 images_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "imagenes")
-
-
-class Settings(object):
-    def __init__(self):
-        self.images_path = images_path
-        # the rest of the settings

@@ -24,7 +24,6 @@ from utils import load_image
 
 from basemodel import BaseModel
 from config import SCREENRECT
-from characters import Holder
 from utils import writer
 
 
@@ -87,7 +86,7 @@ class StatsBar(object):
 
     def generate_unicorn_life_text(self, screen, holder):
         """
-        This feauture is not available at the moment.
+        Generated the life text with numerical measurement.
         """
 
         lives_text, lives_text_position = self.writer(
@@ -101,7 +100,7 @@ class StatsBar(object):
 
     def generate_unicorn_life_bar(self, screen, holder):
         """
-        Generate the unicorns life bar
+        Generate the unicorns life bar.
         """
         life = math.ceil(holder.unicorn.life)
         if life < 1:
@@ -109,7 +108,7 @@ class StatsBar(object):
         try:
             life_bar_rect = pygame.Rect(0, 0, life, 15)
         except:
-            return 
+            return
         life_bar_bkgd = pygame.Surface(life_bar_rect.size)
         life_bar_bkgd.fill((0, 0, 220))
         holder.dirtyrects.append(screen.blit(life_bar_bkgd, (100, 35)))
