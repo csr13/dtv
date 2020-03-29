@@ -146,8 +146,8 @@ while holder.unicorn.alive == bool(1):
         # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         #
         # If the unicorn had its shield activated when it collided with the virus
-        #   
-        #   1) Initiate the death scene.  
+        #
+        #   1) Initiate the death scene.
         #
         #   2) Establish that this instance is dead.
         #
@@ -233,8 +233,7 @@ while holder.unicorn.alive == bool(1):
     #
     # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-    if not int(random.random() * 12):
-        holder.virus_holder.append(Virus("virus.gif"))
+    Virus.replicate(holder.stats.get_current_game_time(), holder)
 
     for host in holder.virus_holder:
         host.update(holder)
