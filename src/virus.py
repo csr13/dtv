@@ -27,12 +27,11 @@ class Virus(BaseModel):
 
     def __init__(self, img, **kwargs):
         super().__init__(img, **kwargs)
+        self.dead = bool(0)
         self.rect[0] = 0
         self.rect[1] = random.randint(1, 420)
         self.facing = random.choice((-1, 1,)) * 10
         self.rect.right = SCREENRECT.right
-        self.replication_frequency = 0
-        self.dead = bool(0)
         self.death_scene_time = 30
 
     @classmethod
