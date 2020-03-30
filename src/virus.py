@@ -53,24 +53,17 @@ class Virus(BaseModel):
             difficulty = 3  # legendary
 
         if not int(random.random() * difficulty):
+            # Check to see if the player is not just
+            # standing in the corners
+
             holder.virus_holder.append(Virus("virus.gif"))
-
-    def get_position(self):
-        """
-        <G3t p0$iti0n 0f h0$t>
-        """
-
-        return (
-            self.rect[0],
-            self.rect[1],
-        )
 
     def death_scene(self):
         """
         <Dr@m@tiK Sc3Ne>
         """
 
-        position = self.get_position()
+        position = self.get_current_position()
         self.image = load_image("x_x.gif")
         self.rect = self.image.get_rect()
         self.rect[0], self.rect[1] = position
