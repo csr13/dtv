@@ -10,9 +10,8 @@
 # limitations under the License.
 
 import os
-import math
-
 import random
+
 import pygame
 from pygame.locals import *
 from config import SCREENRECT
