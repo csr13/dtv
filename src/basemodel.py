@@ -24,6 +24,12 @@ class BaseModel:
         else:
             self.rect = self.image.get_rect()
 
+    def get_current_position(self):
+        return (
+            self.rect[0],
+            self.rect[1],
+        )
+
     def draw(self, screen, holder):
         blt = screen.blit(self.image, self.rect)
         holder.dirtyrects.append(blt)
@@ -33,5 +39,5 @@ class BaseModel:
         holder.dirtyrects.append(blt)
 
     def update(self):
-        """ Override this in each of the classes """
+        """Override this in each of the classes"""
         pass
