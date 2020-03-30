@@ -15,7 +15,11 @@ python3.6 src/gameplay.py
 
 ### How to play 
 
-:exclamation: Avoid the virus at all costs :exclamation:
+:exclamation: Avoid the virus at all costs.
+
+:heart:'s Regenerate player life points.
+
+:star: Good luck.
 
 #### Keys
 
