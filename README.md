@@ -40,4 +40,13 @@ python3.6 src/gameplay.py
 
 I was going to write a bunch of lines u can toggle to change how the game acts, but then I realized you can actually toggle with everything :beer:
 
+#### About icons, gifs, and sounds.
+
+* Background image was taken from the pygame/data
+
+* Unicorn was taken from Icon8
+
+* Virus and heart were taken from animatedimages.org
+
+
 
