@@ -31,6 +31,7 @@ class Virus(BaseModel):
         self.rect[1] = random.randint(1, 420)
         self.facing = random.choice((-1, 1,)) * 10
         self.rect.right = SCREENRECT.right
+        self.hit_player = False
         self.death_scene_time = 30
 
     @classmethod
@@ -72,33 +73,16 @@ class Virus(BaseModel):
         <Mut@t3>.
         """
 
-        holder_index = holder.virus_holder.index(self.rect)
-
-        if self.rect.y < 50:
-            self.rect[1] -= 80
-
-        if self.dead:
-            self.death_scene_time -= 1
-
-            # This is so that when the player hits the enemies
-            # their guts just 'bounce' off.
-
-            if not hasattr(self, "impact"):
-                self.impact = random.choice(["up", "down"])
-
-            if self.impact == "down":
-                self.rect[1], self.rect[0] = (
-                    (self.rect[1] + 6),
-                    (self.rect[0] + 10),
-                )
-            else:
-                self.rect[1], self.rect[0] = (
-                    (self.rect[1] - 6),
-                    (self.rect[0] + 10),
-                )
-
+        self.rect[1] -= 80 if self.rect[1] < 50 else 0
         self.rect[0] = self.rect[0] + self.facing
 
+        if self.dead:
+            img = self.image
+            images = [img, pygame.transform.flip(img, 1, 0)]
+            self.death_scene_time -= 1
+            self.image = images[self.death_scene_time // 3 % 2]
+
         if not SCREENRECT.contains(self.rect):
+            holder_index = holder.virus_holder.index(self.rect)
             holder.virus_holder.pop(holder_index)
             self.facing = -self.facing

@@ -35,7 +35,7 @@ class StatsBar(object):
     def __init__(self):
         self.game_start = time.time()
         self.writer = writer
-        self.viruses_eliminated = 0
+        self.dead_viruses = []
 
     def get_current_game_time(self):
         """

@@ -18,7 +18,7 @@ import random
 import pygame
 from PIL import Image
 
-from config import images_path
+from config import IMAGES_PATH
 
 
 class Img:
@@ -34,7 +34,7 @@ def load_image(file, transparent=None):
     Cargador de imagenes.
     """
 
-    file = os.path.join(images_path, file)
+    file = os.path.join(IMAGES_PATH, file)
     try:
         surface = pygame.image.load(file)
     except pygame.error:
@@ -65,9 +65,9 @@ def flip_img(image, drop_location):
     a la izquierda; para que no se vea rancio.
     """
 
-    to_mirror = Image.open(os.path.join(images_path, image))
+    to_mirror = Image.open(os.path.join(IMAGES_PATH, image))
     mirrored = to_mirror.transpose(Image.FLIP_LEFT_RIGHT)
-    mirrored.save(os.path.join(images_path, drop_location))
+    mirrored.save(os.path.join(IMAGES_PATH, drop_location))
     mirrored.show()
 
 

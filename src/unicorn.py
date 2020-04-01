@@ -22,12 +22,11 @@ from utils import load_image
 
 class Unicorn(BaseModel):
     """
-    Unicorn Class
+    Uni horned main player.
     """
 
     def __init__(self, img, **kwargs):
         super().__init__(img, **kwargs)
-
         self.alive = True
         self.life = 250
         self.dead = False
@@ -37,108 +36,36 @@ class Unicorn(BaseModel):
         self.shield_energy = 250
         self.hit = False
         self.hit_time = 6
-
-    def get_current_position(self):
-        """
-        Get the Unicorn current position.
-        """
-
-        # Return a tuple of (x, y) coordinates representing the current
-        # location of the Unicorn within the screen.
-
-        return (
-            self.rect[0],
-            self.rect[1],
-        )
-
-    def health_ok(self):
-        """
-        Checks the unicorn health.
-        """
-
-        # Return False if the instance has no life left.
-        # Return True is the instance has life left
-
-        if self.life <= 0:
-            return False
-        return True
+        self.health_ok = lambda: False if self.life <= 0 else True
+        self.shield_ok = lambda: False if self.shield_energy <= 0 else True
 
     def regenerate_life(self):
-        """
-        Regenerates the energy of the unicorn.
-        """
+        """Regenerates life"""
 
-        # Increment the instance life by 0.025 if:
-        #    1) Life is less than 250.
-
-        if self.life < 250:
-            self.life += 0.025
-
-    def shield_ok(self):
-        """
-        Checks shield energy.
-        """
-
-        # Return False if the shield has no energy left.
-        # Return True if the shield has energy left.
-
-        if self.shield_energy <= 0:
-            return False
-        return True
+        self.life += 0.025 if self.life < 250 else 0
 
     def regenerate_shield_energy(self):
-        """
-        Regenerates the energy of the shield.
-        """
+        """Regenerates shield energy"""
 
-        # Increment the energy of the shield by 0.036 if:
-        #    1) The energy of the shield is less than 250.
-        #    2) The shield's usage signal is off.
-
-        if self.shield_energy < 250 and self.shield == False:
-            self.shield_energy += 0.036
+        self.shield_energy += (
+            0.036 if self.shield_energy < 250 and self.shield == False else 0
+        )
 
     def activate_shield(self, screen, holder):
-        """
-        Activate the unicorn shield
-        """
-
-        # If the state sent a signal:
-        #   1) Make a surface of the unicorn image size
-        #   2) Fill it with some color.
-        #   3) Blit it to the screen.
-        #   4) Append that to be updated.
-        #   5) Decrease the energy of the shield by a whole energy point.
+        """Activate the unicorn shield."""
 
         if self.shield_ok():
-            shield = pygame.Surface(self.image.get_size()).convert_alpha()
-            shield.fill((102, 255, 102, 0.666))
+            shield = pygame.Surface(self.image.get_size())
+            shield.fill((0, 255, 0))
             shield_blit = screen.blit(shield, self.get_current_position())
             holder.dirtyrects.append(shield_blit)
             self.shield_energy -= 1
 
     def state(self, key, screen):
-        """
-        Capture actions for the unicorn
-        """
-
-        # These signal's declarations control the
-        # behaviour of some of the unicorn's main actions,
-        # they are set to false to re-enable their original state
-        # everytime the state is called within the events loop of
-        # the game loop.
+        """Keylogger"""
 
         self.shield = False
         self.rotate = False
-
-        # Handle a space key event.
-        #
-        #   1) If the shield has no energy
-        #       1.a) Block the user from using the shield
-        #
-        #   2) If the shield has energy
-        #       2.a) Allow the user to use the shield.
-        #       2.b) Send a positive rotate signal to the update function.
 
         if key[K_SPACE]:
             if not self.shield_ok():
@@ -146,8 +73,6 @@ class Unicorn(BaseModel):
             elif self.shield_ok():
                 self.shield = True
                 self.rotate = True
-
-        # Handle move keys place boundaries, code is self explanatory.
 
         if key[K_DOWN]:
             if not self.rect.y > 369:
@@ -176,55 +101,36 @@ class Unicorn(BaseModel):
                 self.rect = self.rect.move(-self.speed, 0)
 
     def death_scene(self):
-        """
-        Dramatic scene.
-        """
-        # All this function does is:
-        #   1) Get the position of the current instance.
-        #   2) Swap the intial image.
-        #   3) Get a rect from the image
-        #   4) Set the previous rect position to the new
-        #      rect, so that it maintains the same position
+        """Dramatic scene."""
 
-        position = (self.rect[0], self.rect[1])
+        position = self.get_current_position()
         self.image = load_image("x_x.gif")
         self.rect = self.image.get_rect()
         self.rect[0], self.rect[1] = position
 
-    def update(self, screen, holder):
-        """
-        Update things.
-        """
+    def hit_scene(self, screen, holder):
 
-        # This checks to see if the instance is dead,
-        # if so, this means the death scene has been
-        # initiated. Therefore we need to decrement
-        # it's duration so that the game can end.
+        self.image = pygame.transform.rotate(self.image, 180)
+        effect = pygame.Surface(self.image.get_size())
+        effect.fill((255, 0, 0))
+        effect_blit = screen.blit(effect, self.get_current_position())
+        holder.dirtyrects.append(effect_blit)
+
+    def update(self, screen, holder):
+        """Update things."""
 
         if self.dead:
             self.dead_scene_time -= 1
 
-        # Deduct points from the instance life,
-        # Set the hit flag to False, otherwise
-        # it will keep decrementing life.
-
         if self.hit:
-            self.life -= 5
+            self.life -= 20
             self.hit = False
-
-        # If there was a shield signal from state,
-        # call the activate_shield .
 
         if self.shield:
             self.activate_shield(screen, holder)
 
-        # If there was a rotate signal from state
-        # rotate the image by 90 degrees
-
         if self.rotate:
             self.image = pygame.transform.rotate(self.image, 90)
-
-        # Regenerate
 
         self.regenerate_shield_energy()
         self.regenerate_life()

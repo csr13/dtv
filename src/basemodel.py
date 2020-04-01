@@ -25,6 +25,9 @@ class BaseModel:
             self.rect = self.image.get_rect()
 
     def get_current_position(self):
+        """
+        Get the current position of the host.
+        """
         return (
             self.rect[0],
             self.rect[1],

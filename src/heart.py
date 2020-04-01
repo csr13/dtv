@@ -12,20 +12,33 @@
 import os
 import random
 
+import pdb
+
+import pygame
+
 from config import SCREENRECT
 from basemodel import BaseModel
 
 
 class Heart(BaseModel):
+    """
+    Heart object representation of a gameplay heart.
+    ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+    If the heart is consumed it inscreases the players life by 50
+    life points.
+
+    ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    """
+
     def __init__(self, img, **kwargs):
         super().__init__(img, **kwargs)
+        self.full = True
         self.rect[0] = 0
         self.rect[1] = random.randint(1, 420)
         self.facing = random.choice((-1, 1)) * 10
         self.rect.right = SCREENRECT.right
-        self.vanish_time = 30
-        self.full = True
-        self.effect = 69
+        self.effect = 50
 
     def consume(self, taker):
         """
@@ -33,14 +46,16 @@ class Heart(BaseModel):
         """
 
         if hasattr(taker, "life"):
-            if taker.life == 250:
-                pass
-            elif 181 <= taker.life < 250:
-                taker.life += 250 - taker.life
-            else:
-                taker.life += self.effect
 
-            self.full = False
+            if taker.life < 250:
+
+                if 181 <= taker.life <= 250:
+                    taker.life += 250 - taker.life
+                else:
+                    taker.life += self.effect
+
+            elif taker.life == 250:
+                pass
 
     @classmethod
     def replicate(heart, rate, holder):
@@ -60,23 +75,36 @@ class Heart(BaseModel):
         if not int(random.random() * refresh):
             holder.hearts_holder.append(Heart("heart.png"))
 
+    def consumed_scene(self, *args):
+        """
+        This scene lasts for as long as vanishing_time is > 0
+        """
+
+        holder = args[2]
+        screen = args[0]
+        player = holder.unicorn
+
+        def glow():
+            """
+            Trigger an effect when the heart is consumed
+            """
+            effect = pygame.Surface(player.image.get_size())
+            effect.fill((0, 0, 255))
+            effect_blit = screen.blit(effect, player.get_current_position())
+            holder.dirtyrects.append(effect_blit)
+
+        self.consume(player)
+        glow()
+
     def update(self, holder):
         """
         Update before drawing
         """
-        holder_index = holder.hearts_holder.index(self.rect)
-        if self.rect.y < 50:
-            self.rect[1] -= 80
 
-        if not self.full:
-            self.vanish_time -= 1
-            self.rect[1], self.rect[0] = (
-                (self.rect[1] + 6),
-                (self.rect[0] + 10),
-            )
-
+        self.rect[1] -= 80 if self.rect.y < 50 else 0
         self.rect[0] = self.rect[0] + self.facing
 
         if not SCREENRECT.contains(self.rect):
+            holder_index = holder.hearts_holder.index(self.rect)
             holder.hearts_holder.pop(holder_index)
             self.facing = -self.facing
