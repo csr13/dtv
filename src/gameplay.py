@@ -57,6 +57,7 @@ holder = Holder(
     unicorn=Unicorn("unicorn.png", spawn_location={"midleft": (50, 640 // 2)}),
     hearts_holder=[],
     virus_holder=[],
+    potion_holder=[],
     stats=StatsBar(),
 )
 
@@ -98,6 +99,7 @@ def main():
         # Collisions
 
         o_o = holder.unicorn.rect.collidelist(holder.hearts_holder)
+        p_p = holder.unicorn.rect.collidelist(holder.potion_holder)
         x_x = holder.unicorn.rect.collidelist(holder.virus_holder)
 
         if x_x != -1:
@@ -128,7 +130,14 @@ def main():
                 heart.consumed_scene(screen, background, holder)
                 heart.full = False
 
+        if p_p != -1:
+            potion = holder.potion_holder[o_o]
+            if potion.full:
+                potion.consume(holder.unicorn)
+                potion.full = False
+        
         Heart.replicate(holder.stats.get_current_game_time(), holder)
+        Potion.replicate(holder.stats.get_current_game_time(), holder)
         Virus.replicate(holder.stats.get_current_game_time(), holder)
 
         # Virus update.
@@ -159,12 +168,24 @@ def main():
         for host in holder.hearts_holder:
             host.draw(screen, holder)
 
+        # Potions update
+
+        for host in holder.potion_holder:
+            host.update(holder)
+
+        for host in holder.potion_holder:
+            if not host.full:
+                holder.potion_holder.pop(holder.potion_holder.index(host))
+
+        for host in holder.potion_holder:
+            host.draw(screen, holder)
+
         holder.unicorn.update(screen, holder)
         holder.unicorn.draw(screen, holder)
         holder.stats.update(screen, holder)
         pygame.display.update(holder.dirtyrects)
         holder.reset_dirtyrects()
-        clock.tick(50)
+        clock.tick(24)
 
 
 def end_of_game_display():

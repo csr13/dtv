@@ -44,7 +44,7 @@ class Virus(BaseModel):
         # for three minutes, after that set the difficulty to legendary
 
         if rate < 60:
-            difficulty = 19  # rookie
+            difficulty = 12  # rookie
         elif 60 < rate < 120:
             difficulty = 10  # medium
         elif 120 < rate < 180:

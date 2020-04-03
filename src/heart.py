@@ -41,27 +41,20 @@ class Heart(BaseModel):
         self.effect = 50
 
     def consume(self, taker):
-        """
-        Consume life and give it to the taker.
-        """
+        """Consume life and give it to the taker."""
 
         if hasattr(taker, "life"):
-
             if taker.life < 250:
-
                 if 181 <= taker.life <= 250:
                     taker.life += 250 - taker.life
                 else:
                     taker.life += self.effect
-
             elif taker.life == 250:
                 pass
 
     @classmethod
     def replicate(heart, rate, holder):
-        """
-        Spawn random energy.
-        """
+        """Spawn random energy."""
 
         if rate < 60:
             refresh = 200
@@ -76,18 +69,15 @@ class Heart(BaseModel):
             holder.hearts_holder.append(Heart("heart.png"))
 
     def consumed_scene(self, *args):
-        """
-        This scene lasts for as long as vanishing_time is > 0
-        """
+        """This scene lasts for as long as vanishing_time is > 0"""
 
         holder = args[2]
         screen = args[0]
         player = holder.unicorn
 
         def glow():
-            """
-            Trigger an effect when the heart is consumed
-            """
+            """Trigger an effect when the heart is consumed"""
+    
             effect = pygame.Surface(player.image.get_size())
             effect.fill((0, 0, 255))
             effect_blit = screen.blit(effect, player.get_current_position())
@@ -97,9 +87,7 @@ class Heart(BaseModel):
         glow()
 
     def update(self, holder):
-        """
-        Update before drawing
-        """
+        """Update before drawing"""
 
         self.rect[1] -= 80 if self.rect.y < 50 else 0
         self.rect[0] = self.rect[0] + self.facing
