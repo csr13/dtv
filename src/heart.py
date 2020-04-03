@@ -77,7 +77,7 @@ class Heart(BaseModel):
 
         def glow():
             """Trigger an effect when the heart is consumed"""
-    
+
             effect = pygame.Surface(player.image.get_size())
             effect.fill((0, 0, 255))
             effect_blit = screen.blit(effect, player.get_current_position())
