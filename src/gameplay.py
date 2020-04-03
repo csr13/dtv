@@ -33,7 +33,7 @@ pygame.init()
 pygame.key.set_repeat(10, 100)
 pygame.display.set_caption(" Slip the Virus ")
 pygame.mixer.music.load(os.path.join(SOUNDS_PATH, "towel_defence.mp3"))
-# pygame.mixer.music.play(-1, 0.0)
+pygame.mixer.music.play(-1, 0.0)
 
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode(SCREENRECT.size)
@@ -135,7 +135,7 @@ def main():
             if potion.full:
                 potion.consume(holder.unicorn)
                 potion.full = False
-        
+
         Heart.replicate(holder.stats.get_current_game_time(), holder)
         Potion.replicate(holder.stats.get_current_game_time(), holder)
         Virus.replicate(holder.stats.get_current_game_time(), holder)
@@ -174,7 +174,7 @@ def main():
             host.update(holder)
 
         for host in holder.potion_holder:
-            if not host.full:
+            if host.full == False:
                 holder.potion_holder.pop(holder.potion_holder.index(host))
 
         for host in holder.potion_holder:
@@ -185,7 +185,7 @@ def main():
         holder.stats.update(screen, holder)
         pygame.display.update(holder.dirtyrects)
         holder.reset_dirtyrects()
-        clock.tick(24)
+        clock.tick(50)
 
 
 def end_of_game_display():
