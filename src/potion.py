@@ -17,6 +17,7 @@ import pygame
 from config import SCREENRECT
 from basemodel import BaseModel
 
+
 class Potion(BaseModel):
     def __init__(self, img, **kwargs):
         super().__init__(img, **kwargs)
@@ -26,37 +27,46 @@ class Potion(BaseModel):
         self.facing = random.choice((-1, 1)) * 10
         self.rect.right = SCREENRECT.right
         self.effect = 50
-        self.special_effect_time = 13
-    
+
     def consume(self, taker):
-        if hasattr(taker, "energy"):
-            if -1 < taker.energy <= 250:
-                taker.energy+=(250-taker.life)if(200<=taker.energy<=250)else self.effect
-            elif taker.energy == 250:
+        """Consume method, gives energy to the taker"""
+
+        if hasattr(taker, "shield_energy"):
+            if taker.shield_energy < 250:
+                taker.shield_energy += (
+                    (250 - taker.shield_energy)
+                    if (200 <= taker.shield_energy <= 250)
+                    else self.effect
+                )
+            elif taker.shield_energy == 250:
                 pass
-    
+
     @classmethod
     def replicate(potion, rate, holder):
-        if rate < 60: 
-            spawn = 20
-        elif 60 < rate < 120: 
-            spawn = 25
-        elif 120 < rate < 180: 
-            spawn = 28
-        else: 
-            spawn = 30
+        """Replicate a potion given a few data"""
+
+        if rate < 60:
+            spawn = 100
+        elif 60 < rate < 120:
+            spawn = 80
+        elif 120 < rate < 180:
+            spawn = 60
+        else:
+            spawn = 60
         if not int(random.random() * spawn):
             holder.potion_holder.append(Potion("potion.gif"))
-    
+
     def update(self, holder):
+        """Update the sprite on the screen"""
+
         self.rect.y -= 80 if self.rect.y < 50 else 0
         self.rect.x = self.rect[0] + self.facing
+
         images = [self.image, pygame.transform.flip(self.image, 1, 0)]
-        self.image = images[random.randint(1, 6)//3%2]
+        self.image = images[random.randint(1, 6) // 3 % 2]
         self.image = pygame.transform.rotate(self.image, 360)
 
         if not SCREENRECT.contains(self.rect):
             holder_index = holder.potion_holder.index(self.rect)
             holder.potion_holder.pop(holder_index)
             self.facing = -self.facing
-
