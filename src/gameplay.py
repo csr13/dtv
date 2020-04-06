@@ -13,7 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import math
 import os
 import random
 import time
@@ -24,16 +23,15 @@ from pygame.locals import *
 
 from characters import *
 from config import SCREENRECT, SOUNDS_PATH
-from utils import load_image, Img, writer
+from utils.utils import load_image, writer
 
 
 # Setup
-
 pygame.init()
 pygame.key.set_repeat(10, 100)
 pygame.display.set_caption(" Slip the Virus ")
 pygame.mixer.music.load(os.path.join(SOUNDS_PATH, "towel_defence.mp3"))
-pygame.mixer.music.play(-1, 0.0)
+# pygame.mixer.music.play(-1, 0.0)
 
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode(SCREENRECT.size)
@@ -41,18 +39,11 @@ img_background = load_image("background.gif")
 background = pygame.Surface(SCREENRECT.size)
 
 # Background
-
 for x in range(0, SCREENRECT.width, img_background.get_width()):
     background.blit(img_background, (x, 0))
 background_rect = background.get_rect()
 
-# Sonds
-
-hit_sound = pygame.mixer.Sound(os.path.join(SOUNDS_PATH, "punch.wav"))
-saw_sound = pygame.mixer.Sound(os.path.join(SOUNDS_PATH, "saw_sound.wav"))
-
 # 'Stuff' holder
-
 holder = Holder(
     unicorn=Unicorn("unicorn.png", spawn_location={"midleft": (50, 640 // 2)}),
     hearts_holder=[],
@@ -61,10 +52,9 @@ holder = Holder(
     stats=StatsBar(),
 )
 
-# Main game loop
-
 
 def main():
+    """Main game loop"""
 
     while holder.unicorn.alive == bool(1):
         if holder.unicorn.dead_scene_time <= 0:
@@ -97,51 +87,41 @@ def main():
                 exit(1)
 
         # Collisions
-
-        o_o = holder.unicorn.rect.collidelist(holder.hearts_holder)
+        h_h = holder.unicorn.rect.collidelist(holder.hearts_holder)
         p_p = holder.unicorn.rect.collidelist(holder.potion_holder)
         x_x = holder.unicorn.rect.collidelist(holder.virus_holder)
 
         if x_x != -1:
-
-            if holder.unicorn.shield == False and not holder.virus_holder[x_x].dead:
-
-                if not holder.unicorn.health_ok():
-                    holder.unicorn.dead = True
+            virus = holder.virus_holder[x_x]
+            player = holder.unicorn
+            if player.shield == False and not virus.dead:
+                if not player.health_ok():
                     holder.unicorn.death_scene()
-                elif not holder.virus_holder[x_x].hit_player:
-                    hit_sound.play()
-                    holder.unicorn.hit = True
-                    holder.unicorn.hit_scene(screen, holder)
-                    holder.virus_holder[x_x].hit_player = True
-                elif holder.virus_holder[x_x].hit_player:
+                elif not virus.hit_player:
+                    virus.hit(screen, player, holder)
+                elif virus.hit_player:
                     pass
+            elif player.shield == True:
+                player.kill_enemy(virus)
 
-            elif holder.unicorn.shield == True:
-                saw_sound.play()
-                holder.virus_holder[x_x].death_scene()
-                holder.virus_holder[x_x].dead = True
-
-        if o_o != -1:
-
-            heart = holder.hearts_holder[o_o]
-
+        if h_h != -1:
+            heart = holder.hearts_holder[h_h]
             if heart.full:
                 heart.consumed_scene(screen, background, holder)
                 heart.full = False
 
         if p_p != -1:
-            potion = holder.potion_holder[o_o]
+            potion = holder.potion_holder[p_p]
             if potion.full:
                 potion.consume(holder.unicorn)
                 potion.full = False
 
+        # Replications
         Heart.replicate(holder.stats.get_current_game_time(), holder)
         Potion.replicate(holder.stats.get_current_game_time(), holder)
         Virus.replicate(holder.stats.get_current_game_time(), holder)
 
         # Virus update.
-
         for host in holder.virus_holder:
             host.update(holder)
 
@@ -157,7 +137,6 @@ def main():
             host.draw(screen, holder)
 
         # Hearts update
-
         for host in holder.hearts_holder:
             host.update(holder)
 
@@ -169,12 +148,11 @@ def main():
             host.draw(screen, holder)
 
         # Potions update
-
         for host in holder.potion_holder:
             host.update(holder)
 
         for host in holder.potion_holder:
-            if host.full == False:
+            if not host.full:
                 holder.potion_holder.pop(holder.potion_holder.index(host))
 
         for host in holder.potion_holder:
@@ -182,18 +160,15 @@ def main():
 
         holder.unicorn.update(screen, holder)
         holder.unicorn.draw(screen, holder)
-        holder.stats.update(screen, holder)
+        holder.stats.update(screen, holder, background)
         pygame.display.update(holder.dirtyrects)
         holder.reset_dirtyrects()
         clock.tick(50)
 
 
-def end_of_game_display():
-    pass
-
-
 if __name__ == "__main__":
     main()
+    # make this a function of the StatsBar and place it inside main.
     print(
         f"""
     + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + 
