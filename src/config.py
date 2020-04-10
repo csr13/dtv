@@ -19,5 +19,9 @@ from pygame import Rect
 
 SCREENRECT = Rect(0, 0, 800, 480)
 
-SOUNDS_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sounds")
-IMAGES_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "imagenes")
+ASSETS_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets")
+
+SOUNDS_PATH = os.path.join(ASSETS_PATH, "sounds")
+
+IMAGES_PATH = os.path.join(ASSETS_PATH, "imagenes")
+

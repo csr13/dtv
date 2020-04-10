@@ -21,7 +21,7 @@ import pdb
 import pygame
 from pygame.locals import *
 
-from characters import *
+from actors.characters import *
 from config import SCREENRECT, SOUNDS_PATH
 from utils.utils import load_image, writer
 

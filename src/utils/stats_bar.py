@@ -46,6 +46,7 @@ class StatsBar(object):
 
         return math.ceil(divmod((math.ceil(time.time()) - self.game_start), 1000)[1])
 
+
     def generate_game_time(self, screen, holder):
         """
         Generates points and appends a blit to be updated.
@@ -68,6 +69,7 @@ class StatsBar(object):
         holder.dirtyrects.append(screen.blit(time_number_text, time_number_position))
         holder.dirtyrects.append(screen.blit(time_text, time_position))
 
+
     def generate_energy_bar_text(self, screen, holder):
         """
         Generates energy bar and appends a blit to be updated.
@@ -82,6 +84,7 @@ class StatsBar(object):
         )
         holder.dirtyrects.append(screen.blit(energy_text, energy_position))
 
+
     def generate_energy_bar(self, screen, holder):
         """
         Generate the energy bar append its blit to be updated.
@@ -92,6 +95,7 @@ class StatsBar(object):
         energy_bar_bkgd = pygame.Surface(energy_bar_rect.size)
         energy_bar_bkgd.fill((0, 255, 0))
         holder.dirtyrects.append(screen.blit(energy_bar_bkgd, (70, 0)))
+
 
     def generate_unicorn_life_text(self, screen, holder):
         """
@@ -107,10 +111,12 @@ class StatsBar(object):
         )
         holder.dirtyrects.append(screen.blit(lives_text, lives_text_position))
 
+
     def generate_unicorn_life_bar(self, screen, holder):
         """
         Generate the unicorns life bar.
         """
+
         life = math.ceil(holder.unicorn.life)
         if life < 1:
             life = 1
@@ -122,10 +128,12 @@ class StatsBar(object):
         life_bar_bkgd.fill((0, 0, 220))
         holder.dirtyrects.append(screen.blit(life_bar_bkgd, (70, 36)))
 
+
     def generate_grid(self, background):
         """
         Generate a bottom border that contains the stats
         """
+
         pygame.draw.line(
             background, (0, 255, 0), (800, 70), (0, 70),
         )
@@ -133,10 +141,12 @@ class StatsBar(object):
         pygame.draw.line(background, (0, 255, 0), (800, 0), (0, 0))
         pygame.draw.line(background, (0, 255, 0), (320, 35), (0, 35))
 
+
     def generate_virus_killed(self, screen, holder):
         """
         Generate stats for viruses killed
         """
+
         kill_count = len(self.dead_viruses)
         kill_count_text, kill_count_text_position = self.writer(
             phrase=f"Kill count ",
@@ -157,10 +167,12 @@ class StatsBar(object):
             screen.blit(kill_count_number, kill_count_number_position)
         )
 
+
     def update(self, screen, holder, background=None):
         """
         Update everyting.
         """
+
         self.generate_unicorn_life_text(screen, holder)
         self.generate_unicorn_life_bar(screen, holder)
         self.generate_energy_bar_text(screen, holder)

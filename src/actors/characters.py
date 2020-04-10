@@ -12,8 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from actors.unicorn import Unicorn
-from actors.virus import Virus
+import sys
+sys.path.append("..")
+
+from .unicorn import Unicorn
+from .virus import Virus
 
 from perks.potion import Potion
 from perks.heart import Heart
