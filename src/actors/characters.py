@@ -15,14 +15,12 @@
 import sys
 sys.path.append("..")
 
-from .unicorn import Unicorn
-from .virus import Virus
-
 from perks.potion import Potion
 from perks.heart import Heart
-
+from .unicorn import Unicorn
 from utils.holder import Holder
 from utils.stats_bar import StatsBar
+from .virus import Virus
 
 
 # The objects inside this list are imported with *, like this.
