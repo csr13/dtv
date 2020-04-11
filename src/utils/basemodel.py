@@ -28,9 +28,7 @@ class BaseModel:
             self.rect = self.image.get_rect()
 
     def get_current_position(self):
-        """
-        Get the current position of the host.
-        """
+        """Get the current position of the host."""
         return (
             self.rect[0],
             self.rect[1],
@@ -45,5 +43,5 @@ class BaseModel:
         holder.dirtyrects.append(blt)
 
     def update(self):
-        """Override this in each of the classes"""
+        """Override this method"""
         pass
