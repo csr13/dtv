@@ -25,9 +25,7 @@ from utils.utils import load_image
 
 
 class Unicorn(BaseModel):
-    """
-    Uni horned main player.
-    """
+    """Main player."""
 
     def __init__(self, img, **kwargs):
         super().__init__(img, **kwargs)
@@ -115,6 +113,7 @@ class Unicorn(BaseModel):
         self.dead = True
 
     def hit_scene(self, screen, holder):
+        """This happens when the player gets hit"""
 
         self.image = pygame.transform.rotate(self.image, 180)
         effect = pygame.Surface(self.image.get_size())
@@ -124,6 +123,7 @@ class Unicorn(BaseModel):
 
     def kill_enemy(self, enemy):
         """Kill an enemy and play a sound"""
+        
         self.kill_sound.play()
         enemy.death_scene()
         enemy.dead = True
