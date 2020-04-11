@@ -77,6 +77,7 @@ class StatsBar(object):
         """
         Generates the stats bar background
         """
+        
         background_rect = pygame.Rect(0, 0, 800, 71)
         background_bckg = pygame.Surface(background_rect.size).convert_alpha()
         background_bckg.fill((0,0,0, 150))
