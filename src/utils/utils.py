@@ -66,6 +66,3 @@ def flip_img(image, drop_location):
     mirrored.show()
 
 
-def random_spawn(dimensions):
-    height = dimensions.get_height()
-    width = dimension.get_width()
