@@ -1,4 +1,4 @@
-## Space Unicorn
+## DuckD Virus
 
 ### Requirements
 `python3.6`
