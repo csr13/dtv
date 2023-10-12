@@ -5,12 +5,13 @@
 Requirements
 ~+~+~+~+~+~+
 
-* python3.6
+* python3
 * A linux environment with a gui.
 
 TO start the game
 
-:~$ python3.6 -m pip install -r requirements.txt
+:~$ python3 -m pip install -r requirements.txt
+:~$ cd src && python3 gameplay.py
 
 ~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~
 How to play 
